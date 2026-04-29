@@ -19,7 +19,7 @@ text-align:center;
 .title{
 font-size:90px;
 font-weight:800;
-background: linear-gradient(90deg,#60a5fa,#a78bfa,#38bdf8);
+background:linear-gradient(90deg,#60a5fa,#a78bfa,#38bdf8);
 -webkit-background-clip:text;
 -webkit-text-fill-color:transparent;
 margin-bottom:25px;
@@ -33,7 +33,7 @@ margin-bottom:60px;
 
 .launch-btn{
 display:inline-block;
-padding:18px 45px;
+padding:18px 50px;
 font-size:26px;
 font-weight:bold;
 text-decoration:none;
@@ -50,6 +50,7 @@ transform:scale(1.05);
 </style>
 """, unsafe_allow_html=True)
 
+
 st.markdown("""
 <div class='title'>
 DevWidget Lab
@@ -60,7 +61,7 @@ Interactive UI Builder
 </div>
 
 <a class="launch-btn"
-href="devwidget.html"
+href="https://lambent-madeleine-888fe3.netlify.app/"
 target="_blank">
 Click Here To Launch DevWidget Lab
 </a>

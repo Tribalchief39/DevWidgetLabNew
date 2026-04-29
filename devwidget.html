@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevWidget Lab — Build UI Visually. Generate Production Code.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            950: '#020617',
+                            900: '#0f172a',
+                            850: '#0b1221',
+                            800: '#1e293b',
+                            750: '#1a2234',
+                            700: '#334155',
+                        },
+                        primary: {
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                        },
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float 6s ease-in-out 2s infinite',
+                        'float-slow': 'float 8s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 3s ease-in-out infinite',
+                        'spin-slow': 'spin 12s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
+                            '50%': { transform: 'translateY(-20px) rotate(2deg)' },
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 20px rgba(59, 130, 246, 0.3)' },
+                            '50%': { boxShadow: '0 0 40px rgba(59, 130, 246, 0.6)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: #020617;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .glass {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-strong {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #ec4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .gradient-text-cyan {
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .animated-gradient {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #0f172a, #1e3a5f);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .glow-blue {
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.3), 0 0 80px rgba(59, 130, 246, 0.1);
+        }
+
+        .grid-pattern {
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .card-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .card-3d-inner {
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .card-3d:hover .card-3d-inner {
+            transform: rotateY(5deg) rotateX(5deg) translateZ(20px);
+        }
+
+        .code-block {
+            background: #0b1221;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 3px;
+            outline: none;
+            width: 100%;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #3b82f6;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            transition: all 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+        }
+
+        input[type="color"] {
+            -webkit-appearance: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+        }
+
+        input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        input[type="color"]::-webkit-color-swatch {
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+        }
+
+        .builder-grid {
+            background-image: radial-gradient(circle, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .tab-active {
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .device-frame {
+            border: 12px solid #1e293b;
+            border-radius: 24px;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(2deg);
+            }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-float-delayed {
+            animation: float 6s ease-in-out 2s infinite;
+        }
+
+        .animate-float-slow {
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(60px) rotateX(8deg);
+            transform-origin: top center;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0) rotateX(0deg);
+        }
+
+        .scroll-reveal-left {
+            opacity: 0;
+            transform: translateX(-80px) rotateY(12deg);
+            transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .scroll-reveal-left.revealed {
+            opacity: 1;
+            transform: translateX(0) rotateY(0deg);
+        }
+
+        .scroll-reveal-right {
+            opacity: 0;
+            transform: translateX(80px) rotateY(-12deg);
+            transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .scroll-reveal-right.revealed {
+            opacity: 1;
+            transform: translateX(0) rotateY(0deg);
+        }
+
+        .scroll-scale {
+            opacity: 0;
+            transform: scale(0.85) translateY(40px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .scroll-scale.revealed {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        .scroll-flip {
+            opacity: 0;
+            transform: perspective(800px) rotateX(20deg) translateY(40px);
+            transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .scroll-flip.revealed {
+            opacity: 1;
+            transform: perspective(800px) rotateX(0deg) translateY(0);
+        }
+
+        .delay-100 {
+            transition-delay: 0.1s;
+        }
+
+        .delay-200 {
+            transition-delay: 0.2s;
+        }
+
+        .delay-300 {
+            transition-delay: 0.3s;
+        }
+
+        .delay-400 {
+            transition-delay: 0.4s;
+        }
+
+        .delay-500 {
+            transition-delay: 0.5s;
+        }
+
+        .delay-600 {
+            transition-delay: 0.6s;
+        }
+    </style>
+</head>
+
+<body class="dark bg-slate-950 text-slate-200">
+    <div id="root"></div>
+
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script>window.Icons = {};</script>
+
+    <script type="text/babel" data-presets="react">
+        const { useState, useEffect, useRef } = React;
+
+        const useScrollReveal = () => {
+            useEffect(() => {
+                const obs = new IntersectionObserver(entries => {
+                    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); });
+                }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+                const els = document.querySelectorAll('.scroll-reveal,.scroll-reveal-left,.scroll-reveal-right,.scroll-scale,.scroll-flip');
+                els.forEach(el => obs.observe(el));
+                return () => obs.disconnect();
+            });
+        };
+
+        const Icon = ({ d, size = 20, className = '', strokeWidth = 2 }) => (
+            <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" strokeWidth={strokeWidth}
+                strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {Array.isArray(d) ? d.map((path, i) => <path key={i} d={path} />) : <path d={d} />}
+            </svg>
+        );
+
+        const icons = {
+            Layers: "M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5",
+            Code: "M16 18l6-6-6-6M8 6l-6 6 6 6",
+            Copy: ["M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2v-2", "M16 4h2a2 2 0 012 2v12a2 2 0 01-2 2h-2", "M8 4a2 2 0 012-2h4a2 2 0 012 2v2H8V4z"],
+            Check: "M20 6L9 17l-5-5",
+            Zap: "M13 2L3 14h9l-1 8 10-12h-9l1-8z",
+            Palette: "M12 2a10 10 0 100 20 5 5 0 005-5c0-1.66-.4-2.35-1-3l-1-1a2 2 0 010-2.83A2 2 0 0016 8a4 4 0 00-4-4 10 10 0 000 0zM8 14a1 1 0 110-2 1 1 0 010 2zm1-5a1 1 0 110-2 1 1 0 010 2zm5-1a1 1 0 110-2 1 1 0 010 2zm2 4a1 1 0 110-2 1 1 0 010 2z",
+            Type: ["M4 7V4h16v3", "M9 20h6", "M12 4v16"],
+            Box: ["M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z", "M3.27 6.96L12 12.01l8.73-5.05", "M12 22.08V12"],
+            Layout: ["M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2z", "M3 9h18", "M9 21V9"],
+            MousePointer: ["M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z", "M13 13l6 6"],
+            Sparkles: ["M5 3l.5 2.5L8 6l-2.5.5L5 9l-.5-2.5L2 6l2.5-.5L5 3z", "M19 9l.5 2.5L22 12l-2.5.5L19 15l-.5-2.5L16 12l2.5-.5L19 9z", "M12 3l.5 2.5L15 6l-2.5.5L12 9l-.5-2.5L9 6l2.5-.5L12 3z"],
+            ChevronRight: "M9 18l6-6-6-6",
+            Star: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
+            Users: ["M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2", "M23 21v-2a4 4 0 00-3-3.87", "M16 3.13a4 4 0 010 7.75", "M9 7a4 4 0 100 8 4 4 0 000-8z"],
+            Globe: ["M12 2a10 10 0 100 20A10 10 0 0012 2z", "M2 12h20", "M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"],
+            Shield: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+            Download: ["M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4", "M7 10l5 5 5-5", "M12 15V3"],
+            Eye: ["M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z", "M12 9a3 3 0 100 6 3 3 0 000-6z"],
+            Save: ["M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z", "M17 21v-8H7v8", "M7 3v5h8"],
+            Share: ["M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8", "M16 6l-4-4-4 4", "M12 2v13"],
+            Maximize2: ["M15 3h6v6", "M9 21H3v-6", "M21 3l-7 7", "M3 21l7-7"],
+            Minimize2: ["M4 14h6v6", "M20 10h-6V4", "M14 10l7-7", "M3 21l7-7"],
+            Grid: ["M3 3h7v7H3z", "M14 3h7v7h-7z", "M14 14h7v7h-7z", "M3 14h7v7H3z"],
+            Menu: ["M3 12h18", "M3 6h18", "M3 18h18"],
+            X: ["M18 6L6 18", "M6 6l12 12"],
+            Play: "M5 3l14 9-14 9V3z",
+            RotateCcw: ["M1 4v6h6", "M3.51 15a9 9 0 102.13-9.36L1 10"],
+            Search: ["M11 17.5a6.5 6.5 0 100-13 6.5 6.5 0 000 13z", "M22 22l-4.35-4.35"],
+            Settings: ["M12 15a3 3 0 100-6 3 3 0 000 6z", "M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"],
+            BarChart3: ["M18 20V10", "M12 20V4", "M6 20v-6"],
+            Monitor: ["M20 3H4a1 1 0 00-1 1v12a1 1 0 001 1h16a1 1 0 001-1V4a1 1 0 00-1-1z", "M8 21h8", "M12 17v4"],
+            Tablet: ["M18 2h-12a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2z", "M12 18h.01"],
+            Smartphone: ["M17 2H7a2 2 0 00-2 2v16a2 2 0 002 2h10a2 2 0 002-2V4a2 2 0 00-2-2z", "M12 18h.01"],
+            Plus: ["M12 5v14", "M5 12h14"],
+            Trash2: ["M3 6h18", "M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6", "M10 11v6", "M14 11v6", "M9 6V4h6v2"],
+            TrendingUp: ["M23 6l-9.5 9.5-5-5L1 18", "M17 6h6v6"],
+        };
+
+        const Ico = ({ name, size = 18, className = '' }) => {
+            const d = icons[name];
+            if (!d) return null;
+            return <Icon d={d} size={size} className={className} />;
+        };
+
+        const GlassCard = ({ children, className = '' }) => (
+            <div className={`glass-card rounded-2xl p-6 ${className}`}>{children}</div>
+        );
+
+        const GradientButton = ({ children, onClick, variant = 'primary', className = '', iconName }) => {
+            const gradients = {
+                primary: 'from-blue-600 via-purple-600 to-pink-600 hover:from-blue-500 hover:via-purple-500 hover:to-pink-500',
+                cyan: 'from-cyan-500 via-blue-600 to-purple-600 hover:from-cyan-400 hover:via-blue-500 hover:to-purple-500',
+                emerald: 'from-emerald-500 via-teal-600 to-cyan-600 hover:from-emerald-400 hover:via-teal-500 hover:to-cyan-500',
+            };
+            return (
+                <button onClick={onClick}
+                    className={`relative px-8 py-4 rounded-xl font-semibold text-white overflow-hidden group transition-all duration-300 hover:scale-105 hover:shadow-2xl ${className}`}>
+                    <div className={`absolute inset-0 bg-gradient-to-r ${gradients[variant]} opacity-90 group-hover:opacity-100 transition-opacity`} />
+                    <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors" />
+                    <span className="relative flex items-center justify-center gap-2">
+                        {iconName && <Ico name={iconName} size={18} />}
+                        {children}
+                    </span>
+                </button>
+            );
+        };
+
+        const SectionHeading = ({ subtitle, title, description }) => (
+            <div className="max-w-3xl mx-auto mb-16 text-center">
+                <span className="inline-block px-4 py-1.5 rounded-full text-sm font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20 mb-4">{subtitle}</span>
+                <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">{title}</h2>
+                <p className="text-lg text-slate-400 leading-relaxed">{description}</p>
+            </div>
+        );
+
+        const Navigation = ({ onNavigate }) => {
+            const [scrolled, setScrolled] = useState(false);
+            const [mobileMenu, setMobileMenu] = useState(false);
+            useEffect(() => {
+                const handleScroll = () => setScrolled(window.scrollY > 50);
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+            const navLinks = [{ label: 'Features', id: 'features' }, { label: 'Components', id: 'components' }, { label: 'Playground', id: 'playground' }, { label: 'Pricing', id: 'pricing' }];
+            return (
+                <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'glass-strong py-3' : 'bg-transparent py-6'}`}>
+                    <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+                        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => onNavigate('landing')}>
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <Ico name="Layers" size={20} className="text-white" />
+                            </div>
+                            <span className="text-xl font-bold tracking-tight">DevWidget<span className="gradient-text"> Lab</span></span>
+                        </div>
+                        <div className="hidden md:flex items-center gap-8">
+                            {navLinks.map(link => (
+                                <button key={link.id} onClick={() => onNavigate(link.id)}
+                                    className="text-sm font-medium text-slate-400 hover:text-white transition-colors relative group">
+                                    {link.label}
+                                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 group-hover:w-full transition-all duration-300" />
+                                </button>
+                            ))}
+                        </div>
+                        <div className="hidden md:flex items-center gap-4">
+                            <button className="text-sm font-medium text-slate-400 hover:text-white transition-colors">Sign In</button>
+                            <GradientButton onClick={() => onNavigate('playground')} className="px-5 py-2.5 text-sm">Launch Playground</GradientButton>
+                        </div>
+                        <button className="md:hidden text-slate-300" onClick={() => setMobileMenu(!mobileMenu)}>
+                            <Ico name={mobileMenu ? 'X' : 'Menu'} size={24} />
+                        </button>
+                    </div>
+                    {mobileMenu && (
+                        <div className="md:hidden glass-strong mt-4 mx-6 rounded-2xl p-6 space-y-4">
+                            {navLinks.map(link => (
+                                <button key={link.id} onClick={() => { onNavigate(link.id); setMobileMenu(false); }}
+                                    className="block w-full text-left text-slate-300 hover:text-white py-2">{link.label}</button>
+                            ))}
+                            <GradientButton onClick={() => onNavigate('playground')} className="w-full">Launch Playground</GradientButton>
+                        </div>
+                    )}
+                </nav>
+            );
+        };
+
+        const Hero = ({ onNavigate }) => {
+            const wrapperRef = useRef(null);
+            const frameRef = useRef(null);
+            const piecesRef = useRef([]);
+            useEffect(() => {
+                const cfg = [{ tx: -240, ty: -200, rot: -38, sc: 0.45 }, { tx: 280, ty: -140, rot: 30, sc: 0.45 }, { tx: -280, ty: 220, rot: -45, sc: 0.35 }, { tx: 310, ty: 180, rot: 40, sc: 0.35 }];
+                const onScroll = () => {
+                    const section = wrapperRef.current?.closest('section');
+                    if (!section) return;
+                    const rect = section.getBoundingClientRect();
+                    const p = Math.max(0, Math.min(1, -rect.top / (section.offsetHeight * 0.6)));
+                    if (frameRef.current) {
+                        frameRef.current.style.transform = `perspective(1200px) rotateX(${p * 28}deg) translateY(${p * 140}px) translateZ(${p * -320}px) scale(${1 - p * 0.32})`;
+                        frameRef.current.style.opacity = Math.max(0, 1 - p * 1.5);
+                    }
+                    piecesRef.current.forEach((el, i) => {
+                        if (!el || !cfg[i]) return;
+                        const c = cfg[i];
+                        el.style.transform = `translate(${p * c.tx}px,${p * c.ty}px) rotate(${p * c.rot}deg) scale(${1 - p * (1 - c.sc)})`;
+                        el.style.opacity = Math.max(0, 1 - p * 1.8);
+                    });
+                };
+                window.addEventListener('scroll', onScroll, { passive: true });
+                return () => window.removeEventListener('scroll', onScroll);
+            }, []);
+            const floatingComponents = [
+                { iconName: 'Box', label: 'Button', color: 'from-blue-500 to-cyan-500', pos: 'top-20 -left-4', delay: '0s' },
+                { iconName: 'Layout', label: 'Card', color: 'from-purple-500 to-pink-500', pos: 'top-32 -right-4', delay: '1s' },
+                { iconName: 'BarChart3', label: 'Chart', color: 'from-emerald-500 to-teal-500', pos: 'bottom-32 -left-8', delay: '2s' },
+                { iconName: 'Type', label: 'Form', color: 'from-orange-500 to-red-500', pos: 'bottom-20 -right-8', delay: '1.5s' },
+            ];
+            return (
+                <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+                    <div className="absolute inset-0 animated-gradient" />
+                    <div className="absolute inset-0 grid-pattern opacity-50" />
+                    <div className="orb w-96 h-96 bg-blue-600 top-0 left-1/4 animate-float" />
+                    <div className="orb w-80 h-80 bg-purple-600 bottom-0 right-1/4 animate-float-delayed" />
+                    <div className="orb w-64 h-64 bg-cyan-600 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-float-slow" />
+                    <div className="relative z-10 max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-12 items-center">
+                        <div className="space-y-8">
+                            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-blue-300 border border-blue-500/20 scroll-reveal">
+                                <Ico name="Sparkles" size={16} className="text-blue-400" />
+                                <span>Now with AI-powered component generation</span>
+                            </div>
+                            <h1 className="scroll-reveal delay-100 text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
+                                Build UI <span className="gradient-text">Visually.</span><br />
+                                Generate <span className="gradient-text-cyan">Production Code.</span>
+                            </h1>
+                            <p className="scroll-reveal delay-200 text-xl text-slate-400 leading-relaxed max-w-xl">
+                                The visual frontend playground where designers and developers create 100+ customizable UI components without writing a single line of code.
+                            </p>
+                            <div className="scroll-reveal delay-300 flex flex-wrap gap-4">
+                                <GradientButton onClick={() => onNavigate('playground')} iconName="Zap">Launch Playground</GradientButton>
+                                <button onClick={() => onNavigate('components')} className="px-8 py-4 rounded-xl font-semibold text-slate-300 border border-slate-700 hover:border-slate-500 hover:text-white transition-all duration-300 flex items-center gap-2 group">
+                                    Explore Components <Ico name="ChevronRight" size={18} className="group-hover:translate-x-1 transition-transform" />
+                                </button>
+                            </div>
+                            <div className="scroll-reveal delay-400 flex items-center gap-6 pt-4">
+                                <div className="flex -space-x-3">
+                                    {[1, 2, 3, 4].map(i => (<div key={i} className="w-10 h-10 rounded-full border-2 border-slate-900 bg-gradient-to-br from-slate-700 to-slate-600 flex items-center justify-center text-xs font-bold">{String.fromCharCode(64 + i)}</div>))}
+                                </div>
+                                <div>
+                                    <div className="flex items-center gap-1 mb-1">{[1, 2, 3, 4, 5].map(i => <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="#facc15" stroke="#facc15" strokeWidth="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>)}</div>
+                                    <p className="text-sm text-slate-500">Trusted by 12,000+ developers</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div ref={wrapperRef} className="relative" style={{ perspective: '1200px' }}>
+                            <div ref={frameRef} style={{ willChange: 'transform, opacity', transformOrigin: 'center bottom' }}>
+                                <div className="device-frame bg-slate-900 overflow-hidden">
+                                    <div className="h-8 bg-slate-800 flex items-center px-4 gap-2">
+                                        <div className="w-3 h-3 rounded-full bg-red-500" />
+                                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                                        <div className="ml-auto text-xs text-slate-500">DevWidget Lab</div>
+                                    </div>
+                                    <div className="p-6 grid grid-cols-3 gap-4 min-h-[400px]">
+                                        <div className="col-span-1 space-y-3">
+                                            <div className="h-8 bg-slate-800 rounded-lg w-3/4 shimmer" />
+                                            <div className="h-24 glass rounded-xl p-3 space-y-2">{[1, 2, 3].map(i => <div key={i} className="h-3 bg-slate-700 rounded" style={{ width: `${[100, 67, 80][i - 1]}%` }} />)}</div>
+                                            <div className="h-32 glass rounded-xl p-3 space-y-2">
+                                                <div className="flex gap-2"><div className="w-6 h-6 rounded bg-blue-500/20" /><div className="w-6 h-6 rounded bg-purple-500/20" /><div className="w-6 h-6 rounded bg-pink-500/20" /></div>
+                                                <div className="h-3 bg-slate-700 rounded w-full" /><div className="h-3 bg-slate-700 rounded w-3/4" />
+                                            </div>
+                                        </div>
+                                        <div className="col-span-2 space-y-4">
+                                            <div className="h-48 glass rounded-xl flex items-center justify-center">
+                                                <div className="px-6 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium shadow-lg shadow-blue-500/25">Preview Button</div>
+                                            </div>
+                                            <div className="h-32 code-block rounded-xl p-4">
+                                                <div className="flex gap-2 mb-3">{[1, 2, 3].map(i => <div key={i} className="w-3 h-3 rounded-full bg-slate-700" />)}</div>
+                                                <div className="space-y-1.5">{[100, 80, 75].map((w, i) => <div key={i} className="h-2 bg-slate-700 rounded" style={{ width: `${w}%` }} />)}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {floatingComponents.map((comp, i) => (
+                                <div key={i} ref={el => piecesRef.current[i] = el}
+                                    className={`absolute ${comp.pos} glass-card px-4 py-3 rounded-xl flex items-center gap-3 animate-float`}
+                                    style={{ animationDelay: comp.delay, willChange: 'transform, opacity' }}>
+                                    <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${comp.color} flex items-center justify-center`}><Ico name={comp.iconName} size={16} className="text-white" /></div>
+                                    <span className="text-sm font-medium text-slate-300">{comp.label}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-500">
+                        <span className="text-xs uppercase tracking-widest">Scroll to explore</span>
+                        <div className="w-6 h-10 rounded-full border-2 border-slate-600 flex justify-center pt-2"><div className="w-1.5 h-3 bg-slate-400 rounded-full animate-bounce" /></div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Stats = () => {
+            const stats = [{ value: '100+', label: 'UI Components', iconName: 'Box' }, { value: '12K+', label: 'Active Users', iconName: 'Users' }, { value: '50K+', label: 'Components Built', iconName: 'Layers' }, { value: '99.9%', label: 'Uptime', iconName: 'Shield' }];
+            return (
+                <section className="py-20 relative">
+                    <div className="max-w-7xl mx-auto px-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            {stats.map((stat, i) => (
+                                <GlassCard key={i} className="text-center group">
+                                    <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform"><Ico name={stat.iconName} size={24} className="text-blue-400" /></div>
+                                    <div className="text-3xl md:text-4xl font-bold gradient-text mb-1">{stat.value}</div>
+                                    <div className="text-sm text-slate-500">{stat.label}</div>
+                                </GlassCard>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Features = () => {
+            const features = [
+                {
+                    iconName: 'MousePointer', title: 'Button Builder', color: 'from-blue-500 to-cyan-500', description: 'Create gradient, neon, glass, and animated buttons with live preview. Customize every pixel from border-radius to box-shadow.',
+                    preview: (<div className="space-y-4"><button className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-medium shadow-lg hover:scale-105 transition-all">Gradient Button</button><button className="px-6 py-3 rounded-xl border border-cyan-400/50 text-cyan-400 font-medium hover:bg-cyan-400/10 transition-all">Neon Outline</button><button className="px-6 py-3 rounded-xl glass text-white font-medium hover:bg-white/10 transition-all">Glass Button</button></div>)
+                },
+                {
+                    iconName: 'Layout', title: 'Card Builder', color: 'from-purple-500 to-pink-500', description: 'Design product cards, profile cards, pricing cards, and interactive flip cards with drag-and-drop simplicity.',
+                    preview: (<div className="grid grid-cols-2 gap-3"><div className="glass-card p-4 rounded-xl"><div className="w-full h-16 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 mb-2" /><div className="h-2 bg-slate-700 rounded w-3/4 mb-1" /><div className="h-2 bg-slate-700 rounded w-1/2" /></div><div className="glass-card p-4 rounded-xl"><div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mx-auto mb-2" /><div className="h-2 bg-slate-700 rounded w-full mb-1" /><div className="h-2 bg-slate-700 rounded w-2/3 mx-auto" /></div></div>)
+                },
+                {
+                    iconName: 'BarChart3', title: 'Chart Builder', color: 'from-emerald-500 to-teal-500', description: 'Build pie charts, progress rings, bar charts, and full dashboard layouts. Animate data visualizations with one click.',
+                    preview: (<div className="flex items-end justify-center gap-2 h-32">{[40, 65, 45, 80, 55, 70, 90].map((h, i) => (<div key={i} className="w-8 rounded-t-lg bg-gradient-to-t from-emerald-600 to-teal-400" style={{ height: `${h}%` }} />))}</div>)
+                },
+                {
+                    iconName: 'Type', title: 'Form Builder', color: 'from-orange-500 to-red-500', description: 'Craft login forms, search bars, toggles, and input fields. Real-time validation styling and accessibility built-in.',
+                    preview: (<div className="space-y-3 max-w-xs mx-auto"><div className="glass rounded-lg px-4 py-2.5 text-sm text-slate-400 border border-slate-700">username@example.com</div><div className="glass rounded-lg px-4 py-2.5 text-sm text-slate-400 border border-slate-700 flex justify-between"><span>••••••••</span><Ico name="Eye" size={14} className="text-slate-500" /></div><div className="flex items-center gap-2"><div className="w-10 h-6 rounded-full bg-orange-500 relative"><div className="w-4 h-4 rounded-full bg-white absolute right-1 top-1" /></div><span className="text-xs text-slate-400">Remember me</span></div></div>)
+                },
+                {
+                    iconName: 'Grid', title: 'Layout Builder', color: 'from-indigo-500 to-purple-500', description: 'Assemble hero sections, pricing tables, testimonials, and footers. Grid and flexbox controls with visual guides.',
+                    preview: (<div className="space-y-2"><div className="grid grid-cols-3 gap-2"><div className="h-12 rounded-lg bg-indigo-500/20 col-span-2" /><div className="h-12 rounded-lg bg-purple-500/20" /></div><div className="grid grid-cols-2 gap-2"><div className="h-12 rounded-lg bg-indigo-500/20" /><div className="h-12 rounded-lg bg-purple-500/20" /></div></div>)
+                },
+                {
+                    iconName: 'Sparkles', title: 'Animation Builder', color: 'from-pink-500 to-rose-500', description: 'Add loaders, hover effects, scroll animations, and micro-interactions. Export clean CSS keyframes and transitions.',
+                    preview: (<div className="flex items-center justify-center gap-4 h-32"><div className="w-12 h-12 rounded-full border-4 border-pink-500/30 border-t-pink-500 animate-spin" /><div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-500 to-rose-500 animate-pulse" /><div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 animate-bounce" /></div>)
+                },
+            ];
+            return (
+                <section id="features" className="py-32 relative">
+                    <div className="absolute inset-0 grid-pattern opacity-30" />
+                    <div className="max-w-7xl mx-auto px-6 relative z-10">
+                        <SectionHeading subtitle="Capabilities" title="Everything you need to build stunning interfaces"
+                            description="From simple buttons to complete website sections, DevWidget Lab gives you the power to create production-ready components visually." />
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {features.map((feature, i) => (
+                                <GlassCard key={i} className="group">
+                                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}><Ico name={feature.iconName} size={24} className="text-white" /></div>
+                                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                                    <p className="text-slate-400 text-sm mb-6 leading-relaxed">{feature.description}</p>
+                                    <div className="glass rounded-xl p-4 min-h-[140px] flex items-center justify-center">{feature.preview}</div>
+                                </GlassCard>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // ── Component Showcase ────────────────────────────────────────────────
+        const ComponentShowcase = ({ onOpenInPlayground }) => {
+            const [activeCategory, setActiveCategory] = useState('buttons');
+            const categoryIcons = { buttons: 'MousePointer', cards: 'Layout', forms: 'Type', charts: 'BarChart3', animations: 'Sparkles' };
+
+            const allCategories = {
+                buttons: [
+                    {
+                        name: 'Gradient Button', playgroundTab: 'button', preset: { text: 'Get Started', bgColor: '#2563eb', textColor: '#ffffff', borderRadius: 12, paddingX: 28, paddingY: 13, fontSize: 15, shadow: 24, gradient: true, gradientEnd: '#7c3aed', hoverScale: true },
+                        preview: <button className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium text-sm">Gradient Button</button>
+                    },
+                    {
+                        name: 'Neon Glow', playgroundTab: 'button', preset: { text: 'Neon Glow', bgColor: '#000000', textColor: '#22d3ee', borderRadius: 10, paddingX: 26, paddingY: 12, fontSize: 15, shadow: 30, gradient: false, gradientEnd: '#22d3ee', hoverScale: true, borderWidth: 2, borderColor: '#22d3ee' },
+                        preview: <button className="px-5 py-2.5 rounded-xl border-2 border-cyan-400 text-cyan-400 text-sm font-medium" style={{ boxShadow: '0 0 16px rgba(34,211,238,0.5)', background: 'transparent' }}>Neon Glow</button>
+                    },
+                    {
+                        name: 'Glass Morph', playgroundTab: 'button', preset: { text: 'Glass Button', bgColor: '#ffffff', textColor: '#ffffff', borderRadius: 14, paddingX: 26, paddingY: 13, fontSize: 15, shadow: 10, gradient: false, gradientEnd: '#ffffff', hoverScale: false, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+                        preview: <button className="px-5 py-2.5 rounded-xl text-white text-sm font-medium" style={{ background: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.25)' }}>Glass Morph</button>
+                    },
+                    {
+                        name: '3D Push', playgroundTab: 'button', preset: { text: '3D Push', bgColor: '#334155', textColor: '#f1f5f9', borderRadius: 10, paddingX: 24, paddingY: 12, fontSize: 15, shadow: 0, gradient: false, gradientEnd: '#334155', hoverScale: false },
+                        preview: <button className="px-5 py-2.5 rounded-xl bg-slate-700 text-white text-sm font-medium border-b-4 border-slate-950">3D Push</button>
+                    },
+                ],
+                cards: [
+                    {
+                        name: 'Product Card', playgroundTab: 'card', preset: { title: 'Premium Headphones', subtitle: 'Experience crystal clear audio with noise cancellation.', bgColor: '#1e293b', borderColor: '#334155', borderRadius: 16, showImage: true, showButton: true, buttonColor: '#2563eb', shadow: 30 },
+                        preview: (<div className="glass-card p-3 rounded-xl w-36"><div className="w-full h-16 rounded-lg bg-gradient-to-br from-blue-500/30 to-purple-500/30 mb-2 flex items-center justify-center"><Ico name="Box" size={20} className="text-blue-400" /></div><div className="h-2 bg-slate-700 rounded w-3/4 mb-1" /><div className="h-2 bg-slate-700 rounded w-1/2 mb-2" /><div className="h-5 rounded bg-blue-600/40 w-full" /></div>)
+                    },
+                    {
+                        name: 'Profile Card', playgroundTab: 'card', preset: { title: 'Jane Doe', subtitle: 'Senior UI Designer at Acme Corp', bgColor: '#0f172a', borderColor: '#7c3aed', borderRadius: 20, showImage: true, showButton: true, buttonColor: '#7c3aed', shadow: 40 },
+                        preview: (<div className="glass-card p-3 rounded-xl w-36 text-center"><div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 mx-auto mb-2 flex items-center justify-center text-white text-xs font-bold">JD</div><div className="h-2 bg-slate-700 rounded w-2/3 mx-auto mb-1" /><div className="h-2 bg-slate-700 rounded w-1/2 mx-auto mb-2" /><div className="flex justify-center gap-1">{[1, 2, 3].map(i => <div key={i} className="w-5 h-5 rounded-full bg-slate-700" />)}</div></div>)
+                    },
+                    {
+                        name: 'Pricing Card', playgroundTab: 'card', preset: { title: 'Pro Plan — $19/mo', subtitle: 'Unlimited projects, priority support, team collaboration and API access.', bgColor: '#172554', borderColor: '#3b82f6', borderRadius: 18, showImage: false, showButton: true, buttonColor: '#3b82f6', shadow: 50 },
+                        preview: (<div className="glass-card p-3 rounded-xl w-36 border border-blue-500/30"><div className="text-xs text-blue-400 font-semibold mb-1">PRO</div><div className="text-lg font-bold text-white mb-2">$19<span className="text-xs text-slate-500">/mo</span></div>{['Feature one', 'Feature two', 'Feature three'].map((f, i) => (<div key={i} className="flex items-center gap-1 mb-1"><Ico name="Check" size={10} className="text-emerald-400" /><div className="h-1.5 bg-slate-700 rounded flex-1" /></div>))}</div>)
+                    },
+                    {
+                        name: 'Glass Card', playgroundTab: 'card', preset: { title: 'Glass Surface', subtitle: 'A frosted glass effect card with subtle blur and transparency.', bgColor: '#ffffff', borderColor: 'rgba(255,255,255,0.2)', borderRadius: 24, showImage: true, showButton: false, buttonColor: '#ffffff', shadow: 20 },
+                        preview: (<div className="p-3 rounded-xl w-36" style={{ background: 'rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.15)' }}><div className="w-full h-12 rounded-lg bg-white/5 mb-2" /><div className="h-2 bg-white/20 rounded w-full mb-1" /><div className="h-2 bg-white/20 rounded w-2/3" /></div>)
+                    },
+                ],
+                forms: [
+                    {
+                        name: 'Search Input', playgroundTab: 'input', preset: { placeholder: 'Search anything...', bgColor: '#1e293b', borderColor: '#334155', textColor: '#e2e8f0', borderRadius: 50, fontSize: 14, showIcon: true, focusColor: '#3b82f6', label: 'Search' },
+                        preview: (<div className="w-40"><div className="glass rounded-full px-3 py-2 text-xs text-slate-400 border border-slate-700 flex items-center gap-2"><Ico name="Search" size={12} className="text-slate-500" /><span>Search...</span></div></div>)
+                    },
+                    {
+                        name: 'Email Input', playgroundTab: 'input', preset: { placeholder: 'you@example.com', bgColor: '#0f172a', borderColor: '#3b82f6', textColor: '#e2e8f0', borderRadius: 8, fontSize: 14, showIcon: true, focusColor: '#6366f1', label: 'Email Address' },
+                        preview: (<div className="w-40"><div className="rounded-lg px-3 py-2 text-xs text-slate-400 border border-blue-500/50 flex items-center gap-2" style={{ background: '#0f172a' }}><Ico name="Globe" size={12} className="text-blue-400" /><span>you@example.com</span></div></div>)
+                    },
+                    {
+                        name: 'Toggle Switch', playgroundTab: 'input', preset: { placeholder: 'Toggle option', bgColor: '#1e293b', borderColor: '#10b981', textColor: '#e2e8f0', borderRadius: 8, fontSize: 14, showIcon: false, focusColor: '#10b981', label: 'Enable Feature' },
+                        preview: (<div className="flex items-center gap-3"><div className="w-12 h-6 rounded-full bg-emerald-500 relative"><div className="w-5 h-5 rounded-full bg-white absolute right-0.5 top-0.5 shadow" /></div><span className="text-xs text-slate-400">Enabled</span></div>)
+                    },
+                    {
+                        name: 'Password Input', playgroundTab: 'input', preset: { placeholder: 'Enter your password', bgColor: '#1e293b', borderColor: '#475569', textColor: '#e2e8f0', borderRadius: 10, fontSize: 14, showIcon: true, focusColor: '#f43f5e', label: 'Password' },
+                        preview: (<div className="w-40"><div className="glass rounded-lg px-3 py-2 text-xs text-slate-400 border border-slate-600 flex items-center justify-between"><span>••••••••</span><Ico name="Eye" size={11} className="text-slate-500" /></div></div>)
+                    },
+                ],
+                // ── FIX: charts now use playgroundTab: 'chart' ──────────────
+                charts: [
+                    {
+                        name: 'Bar Chart', playgroundTab: 'chart', preset: { type: 'bar', primaryColor: '#3b82f6', secondaryColor: '#1e3a5f', barRadius: 6, showGrid: true, showValues: false, barCount: 7, title: 'Monthly Revenue', animated: true },
+                        preview: (<div className="flex items-end justify-center gap-1.5 h-24 w-full px-2">{[50, 75, 40, 90, 60, 80, 45].map((h, i) => (<div key={i} className="flex-1 rounded-t bg-gradient-to-t from-blue-700 to-blue-400" style={{ height: `${h}%` }} />))}</div>)
+                    },
+                    {
+                        name: 'Progress Ring', playgroundTab: 'chart', preset: { type: 'ring', primaryColor: '#8b5cf6', secondaryColor: '#1e293b', ringValue: 75, ringWidth: 8, showLabel: true, title: 'Progress', animated: true, barCount: 7 },
+                        preview: (
+                            <div className="relative w-20 h-20">
+                                <svg viewBox="0 0 36 36" className="w-20 h-20 -rotate-90">
+                                    <circle cx="18" cy="18" r="15" fill="none" stroke="#1e293b" strokeWidth="3" />
+                                    <circle cx="18" cy="18" r="15" fill="none" stroke="#8b5cf6" strokeWidth="3" strokeDasharray="75 25" strokeLinecap="round" />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white">75%</div>
+                            </div>)
+                    },
+                    {
+                        name: 'Stat Badge', playgroundTab: 'chart', preset: { type: 'stats', primaryColor: '#10b981', secondaryColor: '#1e293b', barRadius: 8, showGrid: false, showValues: true, barCount: 4, title: 'Dashboard Stats', animated: false },
+                        preview: (<div className="grid grid-cols-2 gap-1.5 w-full">{[{ l: 'Users', v: '12K', c: 'text-blue-400' }, { l: 'Sales', v: '$4K', c: 'text-emerald-400' }, { l: 'Rate', v: '94%', c: 'text-purple-400' }, { l: 'Avg', v: '3.2s', c: 'text-pink-400' }].map((s, i) => (<div key={i} className="glass rounded-lg p-2 text-center"><div className={`text-sm font-bold ${s.c}`}>{s.v}</div><div className="text-xs text-slate-500">{s.l}</div></div>))}</div>)
+                    },
+                    {
+                        name: 'Line Trend', playgroundTab: 'chart', preset: { type: 'line', primaryColor: '#0ea5e9', secondaryColor: '#0f172a', barRadius: 4, showGrid: true, showValues: false, barCount: 7, title: 'Trend Line', animated: true },
+                        preview: (
+                            <svg viewBox="0 0 100 50" className="w-full h-24">
+                                <defs><linearGradient id="lineGrad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3" /><stop offset="100%" stopColor="#3b82f6" stopOpacity="0" /></linearGradient></defs>
+                                <path d="M0,40 L15,30 L30,35 L45,15 L60,20 L75,10 L100,5" fill="none" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
+                                <path d="M0,40 L15,30 L30,35 L45,15 L60,20 L75,10 L100,5 L100,50 L0,50Z" fill="url(#lineGrad2)" />
+                            </svg>)
+                    },
+                ],
+                animations: [
+                    {
+                        name: 'Spinner', playgroundTab: 'animation', preset: { type: 'spinner', color: '#3b82f6', secondaryColor: '#1e3a5f', size: 48, speed: 1, borderWidth: 4, borderRadius: 50, label: '' },
+                        preview: <div className="w-12 h-12 rounded-full border-4 border-blue-500/30 border-t-blue-500 animate-spin" />
+                    },
+                    {
+                        name: 'Pulse', playgroundTab: 'animation', preset: { type: 'pulse', color: '#10b981', secondaryColor: '#065f46', size: 48, speed: 1.5, borderWidth: 0, borderRadius: 12, label: '' },
+                        preview: (<div className="relative"><div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 animate-pulse" /><div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 animate-ping" /><div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500" /></div>)
+                    },
+                    {
+                        name: 'Bounce Dots', playgroundTab: 'animation', preset: { type: 'dots', color: '#8b5cf6', secondaryColor: '#4c1d95', size: 12, speed: 0.6, borderWidth: 0, borderRadius: 50, label: '' },
+                        preview: (<div className="flex items-center gap-2">{[0, 1, 2].map(i => (<div key={i} className="w-3 h-3 rounded-full bg-purple-500 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />))}</div>)
+                    },
+                    {
+                        name: 'Progress Bar', playgroundTab: 'animation', preset: { type: 'progress', color: '#3b82f6', secondaryColor: '#1e293b', size: 8, speed: 2, borderWidth: 0, borderRadius: 9999, label: 'Loading...' },
+                        preview: (<div className="w-40 space-y-2"><div className="h-2 bg-slate-700 rounded-full overflow-hidden"><div className="h-full w-3/4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full animate-pulse" /></div><div className="h-2 bg-slate-700 rounded-full overflow-hidden"><div className="h-full w-1/2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }} /></div></div>)
+                    },
+                ],
+            };
+
+            return (
+                <section id="components" className="py-32 relative overflow-hidden">
+                    <div className="max-w-7xl mx-auto px-6 relative z-10">
+                        <SectionHeading subtitle="Library" title="100+ production-ready components"
+                            description="Browse our extensive collection of customizable UI components. Click any card to open it in the Playground and start editing." />
+                        <div className="flex flex-wrap justify-center gap-3 mb-12">
+                            {Object.keys(allCategories).map(cat => (
+                                <button key={cat} onClick={() => setActiveCategory(cat)}
+                                    className={`px-5 py-2.5 rounded-xl text-sm font-medium capitalize transition-all flex items-center gap-2 ${activeCategory === cat ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'glass text-slate-400 hover:text-white border border-transparent'}`}>
+                                    <Ico name={categoryIcons[cat] || 'Box'} size={16} />{cat}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {allCategories[activeCategory].map((item, i) => (
+                                <div key={`${activeCategory}-${i}`}
+                                    onClick={() => onOpenInPlayground(item.playgroundTab, item.preset)}
+                                    className="glass-card rounded-2xl p-6 cursor-pointer group relative transition-all duration-300"
+                                    style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+                                    <div className="h-36 flex items-center justify-center mb-4 glass rounded-xl relative overflow-hidden">
+                                        <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-2 bg-slate-900/0 group-hover:bg-slate-900/75 transition-all duration-300 rounded-xl">
+                                            <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-3 group-hover:translate-y-0 bg-blue-600 text-white text-xs font-bold px-4 py-2 rounded-full flex items-center gap-2 shadow-lg shadow-blue-500/40">
+                                                <Ico name="Play" size={12} />Edit in Playground
+                                            </div>
+                                        </div>
+                                        <div className="pointer-events-none select-none">{item.preview}</div>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-medium text-sm group-hover:text-blue-300 transition-colors duration-200">{item.name}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">Open →</span>
+                                            <button onClick={e => e.stopPropagation()} className="text-slate-500 hover:text-blue-400 transition-colors p-1"><Ico name="Copy" size={14} /></button>
+                                        </div>
+                                    </div>
+                                    <div className="absolute inset-0 rounded-2xl pointer-events-none ring-0 group-hover:ring-2 ring-blue-500/40 transition-all duration-300" />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        // ── Playground ────────────────────────────────────────────────────────
+        const Playground = ({ activeComponent, setActiveComponent, incomingPreset }) => {
+            const [activeCodeTab, setActiveCodeTab] = useState('html');
+            const [copied, setCopied] = useState(false);
+            const [deviceView, setDeviceView] = useState('monitor');
+            const [justJumped, setJustJumped] = useState(false);
+            const isFirstRender = useRef(true);
+
+            // Button config
+            const [btn, setBtn] = useState({ text: 'Click Me', bgColor: '#3b82f6', textColor: '#ffffff', borderRadius: 12, paddingX: 24, paddingY: 12, fontSize: 16, shadow: 20, gradient: true, gradientEnd: '#8b5cf6', hoverScale: true });
+            const updBtn = (k, v) => setBtn(p => ({ ...p, [k]: v }));
+
+            // Card config
+            const [card, setCard] = useState({ title: 'Card Title', subtitle: 'Subtitle text here', bgColor: '#1e293b', borderColor: '#334155', borderRadius: 16, showImage: true, showButton: true, buttonColor: '#3b82f6', shadow: 30 });
+            const updCard = (k, v) => setCard(p => ({ ...p, [k]: v }));
+
+            // Input config
+            const [inp, setInp] = useState({ placeholder: 'Type something...', bgColor: '#1e293b', borderColor: '#334155', textColor: '#e2e8f0', borderRadius: 8, fontSize: 14, showIcon: true, focusColor: '#3b82f6', label: 'Email Address' });
+            const updInp = (k, v) => setInp(p => ({ ...p, [k]: v }));
+
+            // Badge config
+            const [badge, setBadge] = useState({ text: 'New', bgColor: '#3b82f6', textColor: '#ffffff', borderRadius: 20, fontSize: 12, paddingX: 12, paddingY: 4, showDot: true, dotColor: '#22c55e', variant: 'solid' });
+            const updBadge = (k, v) => setBadge(p => ({ ...p, [k]: v }));
+
+            // Animation config
+            const [anim, setAnim] = useState({ type: 'spinner', color: '#3b82f6', secondaryColor: '#1e3a5f', size: 48, speed: 1, borderWidth: 4, borderRadius: 50, label: '' });
+            const updAnim = (k, v) => setAnim(p => ({ ...p, [k]: v }));
+
+            // ── NEW: Chart config ──────────────────────────────────────────────
+            const [chart, setChart] = useState({ type: 'bar', primaryColor: '#3b82f6', secondaryColor: '#1e3a5f', barRadius: 6, showGrid: true, showValues: false, barCount: 7, title: 'Monthly Revenue', animated: true, ringValue: 75, ringWidth: 8, showLabel: true });
+            const updChart = (k, v) => setChart(p => ({ ...p, [k]: v }));
+
+            // Apply incoming preset when component + preset changes
+            useEffect(() => {
+                if (isFirstRender.current) { isFirstRender.current = false; return; }
+                if (incomingPreset) {
+                    if (activeComponent === 'button') setBtn(p => ({ ...p, ...incomingPreset }));
+                    if (activeComponent === 'card') setCard(p => ({ ...p, ...incomingPreset }));
+                    if (activeComponent === 'input') setInp(p => ({ ...p, ...incomingPreset }));
+                    if (activeComponent === 'badge') setBadge(p => ({ ...p, ...incomingPreset }));
+                    if (activeComponent === 'animation') setAnim(p => ({ ...p, ...incomingPreset }));
+                    if (activeComponent === 'chart') setChart(p => ({ ...p, ...incomingPreset }));
+                }
+                setActiveCodeTab('html');
+                setCopied(false);
+                setJustJumped(true);
+                const t = setTimeout(() => setJustJumped(false), 2500);
+                return () => clearTimeout(t);
+            }, [activeComponent, incomingPreset]);
+
+            const componentTabs = [
+                { id: 'button', label: 'Button', iconName: 'MousePointer' },
+                { id: 'card', label: 'Card', iconName: 'Layout' },
+                { id: 'input', label: 'Input', iconName: 'Type' },
+                { id: 'badge', label: 'Badge', iconName: 'Sparkles' },
+                { id: 'chart', label: 'Chart', iconName: 'BarChart3' },  // ← NEW TAB
+                { id: 'animation', label: 'Animation', iconName: 'RotateCcw' },
+            ];
+
+            // ── Code generators ───────────────────────────────────────────────
+            const getCode = () => {
+                if (activeComponent === 'button') {
+                    const bg = btn.gradient ? `linear-gradient(135deg,${btn.bgColor},${btn.gradientEnd})` : btn.bgColor;
+                    const hoverCss = btn.hoverScale ? `.custom-btn:hover {\n  transform: scale(1.05);\n  box-shadow: 0 8px ${btn.shadow * 1.5}px rgba(0,0,0,0.35);\n}` : '';
+                    return {
+                        html: `<button class="custom-btn">\n  ${btn.text}\n</button>`,
+                        css: `.custom-btn {\n  background: ${bg};\n  color: ${btn.textColor};\n  padding: ${btn.paddingY}px ${btn.paddingX}px;\n  font-size: ${btn.fontSize}px;\n  border-radius: ${btn.borderRadius}px;\n  box-shadow: 0 4px ${btn.shadow}px rgba(0,0,0,0.25);\n  border: none;\n  cursor: pointer;\n  font-weight: 600;\n  transition: all 0.3s ease;\n}\n` + hoverCss,
+                        js: `document.querySelector('.custom-btn')\n  .addEventListener('click', () => {\n    console.log('Clicked!');\n  });`,
+                    };
+                }
+                if (activeComponent === 'card') {
+                    const btnHtml = card.showButton ? '<button class="card-btn">Learn More</button>' : '';
+                    return {
+                        html: '<div class="custom-card">\n  <div class="card-image"></div>\n  <div class="card-body">\n    <h3>' + card.title + '</h3>\n    <p>' + card.subtitle + '</p>\n    ' + btnHtml + '\n  </div>\n</div>',
+                        css: `.custom-card {\n  background: ${card.bgColor};\n  border: 1px solid ${card.borderColor};\n  border-radius: ${card.borderRadius}px;\n  box-shadow: 0 8px ${card.shadow}px rgba(0,0,0,0.3);\n  overflow: hidden;\n  max-width: 320px;\n}\n.card-image {\n  width: 100%;\n  height: 160px;\n  background: linear-gradient(135deg, #3b82f620, #8b5cf620);\n}\n.card-body { padding: 20px; }\n.card-body h3 { color: #f1f5f9; margin-bottom: 8px; font-weight: 700; }\n.card-body p { color: #94a3b8; font-size: 14px; line-height: 1.5; }\n.card-btn {\n  margin-top: 16px;\n  background: ${card.buttonColor};\n  color: white;\n  border: none;\n  padding: 8px 20px;\n  border-radius: 8px;\n  cursor: pointer;\n  width: 100%;\n  font-weight: 600;\n}`,
+                        js: `const card = document.querySelector('.custom-card');\ncard.addEventListener('mouseenter', () => card.style.transform = 'translateY(-4px)');\ncard.addEventListener('mouseleave', () => card.style.transform = 'translateY(0)');`,
+                    };
+                }
+                if (activeComponent === 'input') {
+                    const iconRule = inp.showIcon ? '.input-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #64748b; }\n' : '';
+                    const inputPad = inp.showIcon ? '10px 12px 10px 36px' : '10px 12px';
+                    const iconHtml = inp.showIcon ? '<span class="input-icon">✉</span>' : '';
+                    return {
+                        html: '<div class="input-group">\n  <label class="input-label">' + inp.label + '</label>\n  <div class="input-wrap">\n    ' + iconHtml + '\n    <input type="text" placeholder="' + inp.placeholder + '" class="custom-input" />\n  </div>\n</div>',
+                        css: '.input-group { display: flex; flex-direction: column; gap: 6px; }\n.input-label { color: #94a3b8; font-size: 13px; }\n.input-wrap { position: relative; }\n' + iconRule + '.custom-input {\n  width: 100%;\n  background: ' + inp.bgColor + ';\n  border: 1px solid ' + inp.borderColor + ';\n  border-radius: ' + inp.borderRadius + 'px;\n  color: ' + inp.textColor + ';\n  font-size: ' + inp.fontSize + 'px;\n  padding: ' + inputPad + ';\n  outline: none;\n  transition: border-color 0.2s;\n}\n.custom-input:focus {\n  border-color: ' + inp.focusColor + ';\n  box-shadow: 0 0 0 3px ' + inp.focusColor + '33;\n}',
+                        js: "const input = document.querySelector('.custom-input');\ninput.addEventListener('focus', () => console.log('Focused'));\ninput.addEventListener('input', e => console.log(e.target.value));",
+                    };
+                }
+                if (activeComponent === 'badge') {
+                    const bg = badge.variant === 'outline' ? 'transparent' : badge.variant === 'ghost' ? badge.bgColor + '22' : badge.bgColor;
+                    const border = badge.variant === 'outline' ? '1.5px solid ' + badge.bgColor : 'none';
+                    const color = badge.variant === 'solid' ? badge.textColor : badge.bgColor;
+                    const dotRule = badge.showDot ? '.badge-dot {\n  width: 6px; height: 6px;\n  border-radius: 50%;\n  background: ' + badge.dotColor + ';\n}' : '';
+                    const dotHtml = badge.showDot ? '<span class="badge-dot"></span>' : '';
+                    return {
+                        html: '<span class="custom-badge">\n  ' + dotHtml + '  ' + badge.text + '\n</span>',
+                        css: '.custom-badge {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  background: ' + bg + ';\n  border: ' + border + ';\n  color: ' + color + ';\n  font-size: ' + badge.fontSize + 'px;\n  padding: ' + badge.paddingY + 'px ' + badge.paddingX + 'px;\n  border-radius: ' + badge.borderRadius + 'px;\n  font-weight: 600;\n}\n' + dotRule,
+                        js: "document.querySelector('.custom-badge')\n  .addEventListener('click', e => e.currentTarget.remove());",
+                    };
+                }
+                // ── NEW: Chart code generation ──────────────────────────────
+                if (activeComponent === 'chart') {
+                    const barData = '[40, 65, 45, 80, 55, 70, 90]';
+                    if (chart.type === 'bar') {
+                        return {
+                            html: `<div class="chart-wrapper">\n  ${chart.title ? `<h3 class="chart-title">${chart.title}</h3>` : ''}  <div class="bar-chart">\n    <!-- bars generated by JS -->\n  </div>\n</div>`,
+                            css: `.chart-wrapper { background: #0f172a; padding: 24px; border-radius: 16px; }\n.chart-title { color: #f1f5f9; font-size: 14px; font-weight: 600; margin-bottom: 16px; }\n.bar-chart {\n  display: flex;\n  align-items: flex-end;\n  gap: 8px;\n  height: 160px;\n}\n.bar {\n  flex: 1;\n  background: ${chart.primaryColor};\n  border-radius: ${chart.barRadius}px ${chart.barRadius}px 0 0;\n  transition: opacity 0.2s;\n}\n.bar:hover { opacity: 0.8; }`,
+                            js: `const data = ${barData};\nconst max = Math.max(...data);\nconst chart = document.querySelector('.bar-chart');\ndata.forEach(v => {\n  const bar = document.createElement('div');\n  bar.className = 'bar';\n  bar.style.height = (v / max * 100) + '%';\n  chart.appendChild(bar);\n});`,
+                        };
+                    }
+                    if (chart.type === 'ring') {
+                        const r = 40, circ = 2 * Math.PI * r;
+                        const dash = (chart.ringValue / 100 * circ).toFixed(1);
+                        return {
+                            html: `<div class="ring-wrapper">\n  ${chart.title ? `<p class="ring-title">${chart.title}</p>` : ''}  <div class="ring-container">\n    <svg viewBox="0 0 100 100" width="160" height="160">\n      <circle cx="50" cy="50" r="${r}" fill="none" stroke="${chart.secondaryColor}" stroke-width="${chart.ringWidth}"/>\n      <circle cx="50" cy="50" r="${r}" fill="none" stroke="${chart.primaryColor}" stroke-width="${chart.ringWidth}"\n        stroke-dasharray="${dash} ${(circ - parseFloat(dash)).toFixed(1)}"\n        stroke-linecap="round" transform="rotate(-90 50 50)"/>\n    </svg>\n    ${chart.showLabel ? `<div class="ring-label">${chart.ringValue}%</div>` : ''}\n  </div>\n</div>`,
+                            css: `.ring-wrapper { display: flex; flex-direction: column; align-items: center; gap: 8px; }\n.ring-title { color: #94a3b8; font-size: 13px; }\n.ring-container { position: relative; display: inline-block; }\n.ring-label {\n  position: absolute;\n  inset: 0;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  font-size: 22px;\n  font-weight: 700;\n  color: #f1f5f9;\n}`,
+                            js: `// Animate ring on load\nconst circle = document.querySelector('circle:last-child');\nconst final = '${dash} ${(circ - parseFloat(dash)).toFixed(1)}';\ncircle.style.strokeDasharray = '0 ${circ.toFixed(1)}';\nsetTimeout(() => {\n  circle.style.transition = 'stroke-dasharray 1s ease';\n  circle.style.strokeDasharray = final;\n}, 100);`,
+                        };
+                    }
+                    if (chart.type === 'stats') {
+                        return {
+                            html: `<div class="stats-grid">\n  <div class="stat-card"><div class="stat-value" style="color:${chart.primaryColor}">12K</div><div class="stat-label">Users</div></div>\n  <div class="stat-card"><div class="stat-value" style="color:#a78bfa">$4K</div><div class="stat-label">Revenue</div></div>\n  <div class="stat-card"><div class="stat-value" style="color:#34d399">94%</div><div class="stat-label">Rate</div></div>\n  <div class="stat-card"><div class="stat-value" style="color:#f472b6">3.2s</div><div class="stat-label">Avg</div></div>\n</div>`,
+                            css: `.stats-grid {\n  display: grid;\n  grid-template-columns: repeat(2, 1fr);\n  gap: 12px;\n  max-width: 280px;\n}\n.stat-card {\n  background: ${chart.secondaryColor};\n  border: 1px solid rgba(255,255,255,0.08);\n  border-radius: ${chart.barRadius}px;\n  padding: 16px;\n  text-align: center;\n}\n.stat-value { font-size: 20px; font-weight: 700; margin-bottom: 4px; }\n.stat-label { font-size: 12px; color: #64748b; }`,
+                            js: `// Animate numbers on load\ndocument.querySelectorAll('.stat-value').forEach(el => {\n  const target = parseFloat(el.textContent);\n  let current = 0;\n  const step = target / 40;\n  const timer = setInterval(() => {\n    current = Math.min(current + step, target);\n    el.textContent = el.textContent.replace(/[\\d.]+/, current.toFixed(current < 10 ? 1 : 0));\n    if (current >= target) clearInterval(timer);\n  }, 25);\n});`,
+                        };
+                    }
+                    if (chart.type === 'line') {
+                        return {
+                            html: `<div class="line-chart-wrapper">\n  ${chart.title ? `<h3 class="chart-title">${chart.title}</h3>` : ''}\n  <svg class="line-chart" viewBox="0 0 300 120" preserveAspectRatio="none">\n    <defs>\n      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">\n        <stop offset="0%" stop-color="${chart.primaryColor}" stop-opacity="0.3"/>\n        <stop offset="100%" stop-color="${chart.primaryColor}" stop-opacity="0"/>\n      </linearGradient>\n    </defs>\n    <!-- generated by JS -->\n  </svg>\n</div>`,
+                            css: `.line-chart-wrapper { background: #0f172a; padding: 20px; border-radius: 16px; }\n.chart-title { color: #f1f5f9; font-size: 14px; font-weight: 600; margin-bottom: 12px; }\n.line-chart { width: 100%; height: 120px; overflow: visible; }`,
+                            js: `const data = ${barData};\nconst w = 300, h = 100, pad = 10;\nconst max = Math.max(...data);\nconst pts = data.map((v,i) => [i/(data.length-1)*(w-2*pad)+pad, h-pad-(v/max*(h-2*pad))]);\nconst d = pts.map((p,i)=>(i===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');\nconst area = d + \` L\${pts[pts.length-1][0]},\${h} L\${pts[0][0]},\${h} Z\`;\nconst svg = document.querySelector('.line-chart');\nsvg.innerHTML += \`<path d="\${area}" fill="url(#areaGrad)"/><path d="\${d}" fill="none" stroke="${chart.primaryColor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>\`;`,
+                        };
+                    }
+                    return { html: '', css: '', js: '' };
+                }
+                if (activeComponent === 'animation') {
+                    const dur = anim.speed + 's';
+                    const typeMap = {
+                        spinner: '<div class="anim-spinner"></div>',
+                        pulse: '<div class="anim-pulse">' + (anim.label ? '<span>' + anim.label + '</span>' : '') + '</div>',
+                        dots: '<div class="anim-dots">\n  <span></span><span></span><span></span>\n</div>',
+                        progress: '<div class="anim-progress-wrap">\n  <div class="anim-progress-bar"></div>\n  ' + (anim.label ? '<p class="anim-label">' + anim.label + '</p>' : '') + '\n</div>',
+                    };
+                    const cssByType = {
+                        spinner: `@keyframes spin { to { transform: rotate(360deg); } }\n.anim-spinner {\n  width: ${anim.size}px;\n  height: ${anim.size}px;\n  border-radius: 50%;\n  border: ${anim.borderWidth}px solid ${anim.secondaryColor};\n  border-top-color: ${anim.color};\n  animation: spin ${dur} linear infinite;\n}`,
+                        pulse: `@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(0.95)} }\n.anim-pulse {\n  width: ${anim.size}px;\n  height: ${anim.size}px;\n  background: ${anim.color};\n  border-radius: ${anim.borderRadius}px;\n  animation: pulse ${dur} ease-in-out infinite;\n}`,
+                        dots: `@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-${Math.round(anim.size * 0.8)}px)} }\n.anim-dots { display:flex; gap:${Math.round(anim.size * 0.4)}px; align-items:center; }\n.anim-dots span {\n  width: ${anim.size}px;\n  height: ${anim.size}px;\n  background: ${anim.color};\n  border-radius: 50%;\n  animation: bounce ${dur} ease-in-out infinite;\n}\n.anim-dots span:nth-child(2){animation-delay:${(anim.speed * 0.15).toFixed(2)}s}\n.anim-dots span:nth-child(3){animation-delay:${(anim.speed * 0.3).toFixed(2)}s}`,
+                        progress: `@keyframes progress { 0%{width:0%} 100%{width:100%} }\n.anim-progress-wrap {\n  width: 240px;\n  background: ${anim.secondaryColor};\n  border-radius: ${anim.borderRadius}px;\n  overflow: hidden;\n}\n.anim-progress-bar {\n  height: ${anim.size}px;\n  background: ${anim.color};\n  animation: progress ${dur} ease-in-out infinite alternate;\n}\n.anim-label { margin-top:6px; font-size:12px; color:#94a3b8; }`,
+                    };
+                    return { html: typeMap[anim.type] || '', css: cssByType[anim.type] || '', js: '// Pure CSS animation!\n// To pause:\n// document.querySelector(".anim-' + anim.type + '").style.animationPlayState = "paused";' };
+                }
+                return { html: '', css: '', js: '' };
+            };
+
+            const code = getCode();
+
+            const handleCopy = () => {
+                navigator.clipboard.writeText(code[activeCodeTab]).then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                });
+            };
+
+            // ── Controls ──────────────────────────────────────────────────────
+            const renderControls = () => {
+                if (activeComponent === 'button') return (
+                    <div className="space-y-6">
+                        <div><h4 className="ctrl-heading"><Ico name="Type" size={13} /> Content</h4>
+                            <label className="ctrl-label">Button Text</label>
+                            <input type="text" value={btn.text} onChange={e => updBtn('text', e.target.value)} className="ctrl-input" />
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Palette" size={13} /> Colors</h4>
+                            <div className="grid grid-cols-2 gap-4 mb-3">
+                                <div><label className="ctrl-label">Background</label><input type="color" value={btn.bgColor} onChange={e => updBtn('bgColor', e.target.value)} /></div>
+                                <div><label className="ctrl-label">Text</label><input type="color" value={btn.textColor} onChange={e => updBtn('textColor', e.target.value)} /></div>
+                            </div>
+                            <label className="ctrl-checkbox"><input type="checkbox" checked={btn.gradient} onChange={e => updBtn('gradient', e.target.checked)} className="accent-blue-500" />Use Gradient</label>
+                            {btn.gradient && <div className="mt-3"><label className="ctrl-label">Gradient End</label><input type="color" value={btn.gradientEnd} onChange={e => updBtn('gradientEnd', e.target.value)} /></div>}
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Box" size={13} /> Spacing</h4>
+                            {[{ l: 'Border Radius', k: 'borderRadius', min: 0, max: 50 }, { l: 'Padding X', k: 'paddingX', min: 8, max: 64 }, { l: 'Padding Y', k: 'paddingY', min: 4, max: 32 }].map(c => (
+                                <div key={c.k} className="mb-3">
+                                    <label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>{c.l}</span><span style={{ color: '#64748b' }}>{btn[c.k]}px</span></label>
+                                    <input type="range" min={c.min} max={c.max} value={btn[c.k]} onChange={e => updBtn(c.k, parseInt(e.target.value))} />
+                                </div>
+                            ))}
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Sparkles" size={13} /> Effects</h4>
+                            <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Shadow Blur</span><span style={{ color: '#64748b' }}>{btn.shadow}px</span></label><input type="range" min={0} max={60} value={btn.shadow} onChange={e => updBtn('shadow', parseInt(e.target.value))} /></div>
+                            <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Font Size</span><span style={{ color: '#64748b' }}>{btn.fontSize}px</span></label><input type="range" min={12} max={32} value={btn.fontSize} onChange={e => updBtn('fontSize', parseInt(e.target.value))} /></div>
+                            <label className="ctrl-checkbox"><input type="checkbox" checked={btn.hoverScale} onChange={e => updBtn('hoverScale', e.target.checked)} className="accent-blue-500" />Hover Scale</label>
+                        </div>
+                    </div>
+                );
+                if (activeComponent === 'card') return (
+                    <div className="space-y-6">
+                        <div><h4 className="ctrl-heading"><Ico name="Type" size={13} /> Content</h4>
+                            <label className="ctrl-label">Title</label><input type="text" value={card.title} onChange={e => updCard('title', e.target.value)} className="ctrl-input mb-3" />
+                            <label className="ctrl-label">Subtitle</label><input type="text" value={card.subtitle} onChange={e => updCard('subtitle', e.target.value)} className="ctrl-input" />
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Palette" size={13} /> Colors</h4>
+                            <div className="grid grid-cols-2 gap-4 mb-3">
+                                <div><label className="ctrl-label">Background</label><input type="color" value={card.bgColor} onChange={e => updCard('bgColor', e.target.value)} /></div>
+                                <div><label className="ctrl-label">Border</label><input type="color" value={card.borderColor} onChange={e => updCard('borderColor', e.target.value)} /></div>
+                            </div>
+                            <div><label className="ctrl-label">Button Color</label><input type="color" value={card.buttonColor} onChange={e => updCard('buttonColor', e.target.value)} /></div>
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Box" size={13} /> Shape</h4>
+                            <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Border Radius</span><span style={{ color: '#64748b' }}>{card.borderRadius}px</span></label><input type="range" min={0} max={32} value={card.borderRadius} onChange={e => updCard('borderRadius', parseInt(e.target.value))} /></div>
+                            <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Shadow</span><span style={{ color: '#64748b' }}>{card.shadow}px</span></label><input type="range" min={0} max={60} value={card.shadow} onChange={e => updCard('shadow', parseInt(e.target.value))} /></div>
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Eye" size={13} /> Visibility</h4>
+                            <label className="ctrl-checkbox mb-2"><input type="checkbox" checked={card.showImage} onChange={e => updCard('showImage', e.target.checked)} className="accent-blue-500" />Show Image Area</label>
+                            <label className="ctrl-checkbox"><input type="checkbox" checked={card.showButton} onChange={e => updCard('showButton', e.target.checked)} className="accent-blue-500" />Show Button</label>
+                        </div>
+                    </div>
+                );
+                if (activeComponent === 'input') return (
+                    <div className="space-y-6">
+                        <div><h4 className="ctrl-heading"><Ico name="Type" size={13} /> Content</h4>
+                            <label className="ctrl-label">Label</label><input type="text" value={inp.label} onChange={e => updInp('label', e.target.value)} className="ctrl-input mb-3" />
+                            <label className="ctrl-label">Placeholder</label><input type="text" value={inp.placeholder} onChange={e => updInp('placeholder', e.target.value)} className="ctrl-input" />
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Palette" size={13} /> Colors</h4>
+                            <div className="grid grid-cols-2 gap-4 mb-3">
+                                <div><label className="ctrl-label">Background</label><input type="color" value={inp.bgColor} onChange={e => updInp('bgColor', e.target.value)} /></div>
+                                <div><label className="ctrl-label">Border</label><input type="color" value={inp.borderColor} onChange={e => updInp('borderColor', e.target.value)} /></div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="ctrl-label">Text</label><input type="color" value={inp.textColor} onChange={e => updInp('textColor', e.target.value)} /></div>
+                                <div><label className="ctrl-label">Focus Ring</label><input type="color" value={inp.focusColor} onChange={e => updInp('focusColor', e.target.value)} /></div>
+                            </div>
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Box" size={13} /> Shape</h4>
+                            <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Border Radius</span><span style={{ color: '#64748b' }}>{inp.borderRadius}px</span></label><input type="range" min={0} max={30} value={inp.borderRadius} onChange={e => updInp('borderRadius', parseInt(e.target.value))} /></div>
+                            <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Font Size</span><span style={{ color: '#64748b' }}>{inp.fontSize}px</span></label><input type="range" min={12} max={24} value={inp.fontSize} onChange={e => updInp('fontSize', parseInt(e.target.value))} /></div>
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Eye" size={13} /> Options</h4>
+                            <label className="ctrl-checkbox"><input type="checkbox" checked={inp.showIcon} onChange={e => updInp('showIcon', e.target.checked)} className="accent-blue-500" />Show Icon</label>
+                        </div>
+                    </div>
+                );
+                if (activeComponent === 'badge') return (
+                    <div className="space-y-6">
+                        <div><h4 className="ctrl-heading"><Ico name="Type" size={13} /> Content</h4>
+                            <label className="ctrl-label">Badge Text</label><input type="text" value={badge.text} onChange={e => updBadge('text', e.target.value)} className="ctrl-input" />
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Box" size={13} /> Style</h4>
+                            <label className="ctrl-label">Variant</label>
+                            <div className="flex gap-2 mb-3">
+                                {['solid', 'outline', 'ghost'].map(v => (
+                                    <button key={v} onClick={() => updBadge('variant', v)}
+                                        className={`px-3 py-1.5 rounded-lg text-xs capitalize transition-all ${badge.variant === v ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'glass text-slate-400'}`}>{v}</button>
+                                ))}
+                            </div>
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Palette" size={13} /> Colors</h4>
+                            <div className="grid grid-cols-2 gap-4 mb-3">
+                                <div><label className="ctrl-label">Accent</label><input type="color" value={badge.bgColor} onChange={e => updBadge('bgColor', e.target.value)} /></div>
+                                <div><label className="ctrl-label">Text</label><input type="color" value={badge.textColor} onChange={e => updBadge('textColor', e.target.value)} /></div>
+                            </div>
+                            {badge.showDot && <div><label className="ctrl-label">Dot Color</label><input type="color" value={badge.dotColor} onChange={e => updBadge('dotColor', e.target.value)} /></div>}
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Box" size={13} /> Size</h4>
+                            <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Border Radius</span><span style={{ color: '#64748b' }}>{badge.borderRadius}px</span></label><input type="range" min={0} max={30} value={badge.borderRadius} onChange={e => updBadge('borderRadius', parseInt(e.target.value))} /></div>
+                            <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Padding X</span><span style={{ color: '#64748b' }}>{badge.paddingX}px</span></label><input type="range" min={4} max={24} value={badge.paddingX} onChange={e => updBadge('paddingX', parseInt(e.target.value))} /></div>
+                            <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Font Size</span><span style={{ color: '#64748b' }}>{badge.fontSize}px</span></label><input type="range" min={10} max={20} value={badge.fontSize} onChange={e => updBadge('fontSize', parseInt(e.target.value))} /></div>
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Eye" size={13} /> Options</h4>
+                            <label className="ctrl-checkbox"><input type="checkbox" checked={badge.showDot} onChange={e => updBadge('showDot', e.target.checked)} className="accent-blue-500" />Show Status Dot</label>
+                        </div>
+                    </div>
+                );
+                // ── NEW: Chart controls ──────────────────────────────────────
+                if (activeComponent === 'chart') return (
+                    <div className="space-y-6">
+                        <div><h4 className="ctrl-heading"><Ico name="BarChart3" size={13} /> Chart Type</h4>
+                            <div className="grid grid-cols-2 gap-2">
+                                {[{ id: 'bar', label: 'Bar Chart' }, { id: 'ring', label: 'Progress Ring' }, { id: 'line', label: 'Line Trend' }, { id: 'stats', label: 'Stat Badges' }].map(t => (
+                                    <button key={t.id} onClick={() => updChart('type', t.id)}
+                                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${chart.type === t.id ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'glass text-slate-400 hover:text-white'}`}>{t.label}</button>
+                                ))}
+                            </div>
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Type" size={13} /> Content</h4>
+                            <label className="ctrl-label">Title</label><input type="text" value={chart.title} onChange={e => updChart('title', e.target.value)} className="ctrl-input" />
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Palette" size={13} /> Colors</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="ctrl-label">Primary</label><input type="color" value={chart.primaryColor} onChange={e => updChart('primaryColor', e.target.value)} /></div>
+                                <div><label className="ctrl-label">Background</label><input type="color" value={chart.secondaryColor} onChange={e => updChart('secondaryColor', e.target.value)} /></div>
+                            </div>
+                        </div>
+                        {chart.type === 'bar' && (
+                            <div><h4 className="ctrl-heading"><Ico name="Box" size={13} /> Bar Style</h4>
+                                <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Bar Corner Radius</span><span style={{ color: '#64748b' }}>{chart.barRadius}px</span></label><input type="range" min={0} max={20} value={chart.barRadius} onChange={e => updChart('barRadius', parseInt(e.target.value))} /></div>
+                                <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Bar Count</span><span style={{ color: '#64748b' }}>{chart.barCount}</span></label><input type="range" min={3} max={12} value={chart.barCount} onChange={e => updChart('barCount', parseInt(e.target.value))} /></div>
+                                <label className="ctrl-checkbox"><input type="checkbox" checked={chart.showGrid} onChange={e => updChart('showGrid', e.target.checked)} className="accent-blue-500" />Show Grid Lines</label>
+                            </div>
+                        )}
+                        {chart.type === 'ring' && (
+                            <div><h4 className="ctrl-heading"><Ico name="Box" size={13} /> Ring Style</h4>
+                                <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Value</span><span style={{ color: '#64748b' }}>{chart.ringValue}%</span></label><input type="range" min={0} max={100} value={chart.ringValue} onChange={e => updChart('ringValue', parseInt(e.target.value))} /></div>
+                                <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Ring Width</span><span style={{ color: '#64748b' }}>{chart.ringWidth}px</span></label><input type="range" min={2} max={20} value={chart.ringWidth} onChange={e => updChart('ringWidth', parseInt(e.target.value))} /></div>
+                                <label className="ctrl-checkbox"><input type="checkbox" checked={chart.showLabel} onChange={e => updChart('showLabel', e.target.checked)} className="accent-blue-500" />Show Percentage Label</label>
+                            </div>
+                        )}
+                        {chart.type === 'line' && (
+                            <div><h4 className="ctrl-heading"><Ico name="TrendingUp" size={13} /> Line Style</h4>
+                                <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Data Points</span><span style={{ color: '#64748b' }}>{chart.barCount}</span></label><input type="range" min={3} max={12} value={chart.barCount} onChange={e => updChart('barCount', parseInt(e.target.value))} /></div>
+                                <label className="ctrl-checkbox"><input type="checkbox" checked={chart.showGrid} onChange={e => updChart('showGrid', e.target.checked)} className="accent-blue-500" />Show Area Fill</label>
+                            </div>
+                        )}
+                        {chart.type === 'stats' && (
+                            <div><h4 className="ctrl-heading"><Ico name="Box" size={13} /> Card Style</h4>
+                                <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Card Radius</span><span style={{ color: '#64748b' }}>{chart.barRadius}px</span></label><input type="range" min={0} max={24} value={chart.barRadius} onChange={e => updChart('barRadius', parseInt(e.target.value))} /></div>
+                            </div>
+                        )}
+                    </div>
+                );
+                if (activeComponent === 'animation') return (
+                    <div className="space-y-6">
+                        <div><h4 className="ctrl-heading"><Ico name="RotateCcw" size={13} /> Type</h4>
+                            <div className="grid grid-cols-2 gap-2">
+                                {[{ id: 'spinner', label: 'Spinner' }, { id: 'pulse', label: 'Pulse' }, { id: 'dots', label: 'Bounce Dots' }, { id: 'progress', label: 'Progress' }].map(t => (
+                                    <button key={t.id} onClick={() => updAnim('type', t.id)}
+                                        className={`px-3 py-2 rounded-lg text-xs font-medium transition-all ${anim.type === t.id ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'glass text-slate-400 hover:text-white'}`}>{t.label}</button>
+                                ))}
+                            </div>
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Palette" size={13} /> Colors</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div><label className="ctrl-label">Primary</label><input type="color" value={anim.color} onChange={e => updAnim('color', e.target.value)} /></div>
+                                <div><label className="ctrl-label">Secondary</label><input type="color" value={anim.secondaryColor} onChange={e => updAnim('secondaryColor', e.target.value)} /></div>
+                            </div>
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Box" size={13} /> Size & Shape</h4>
+                            <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>{anim.type === 'progress' ? 'Bar Height' : 'Size'}</span><span style={{ color: '#64748b' }}>{anim.size}px</span></label><input type="range" min={anim.type === 'progress' ? 4 : 24} max={anim.type === 'progress' ? 24 : 80} value={anim.size} onChange={e => updAnim('size', parseInt(e.target.value))} /></div>
+                            {anim.type === 'spinner' && <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Border Width</span><span style={{ color: '#64748b' }}>{anim.borderWidth}px</span></label><input type="range" min={2} max={12} value={anim.borderWidth} onChange={e => updAnim('borderWidth', parseInt(e.target.value))} /></div>}
+                            {(anim.type === 'pulse' || anim.type === 'progress') && <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Border Radius</span><span style={{ color: '#64748b' }}>{anim.borderRadius}px</span></label><input type="range" min={0} max={50} value={anim.borderRadius} onChange={e => updAnim('borderRadius', parseInt(e.target.value))} /></div>}
+                        </div>
+                        <div><h4 className="ctrl-heading"><Ico name="Sparkles" size={13} /> Timing</h4>
+                            <div className="mb-3"><label className="ctrl-label" style={{ display: 'flex', justifyContent: 'space-between' }}><span>Speed</span><span style={{ color: '#64748b' }}>{anim.speed}s</span></label><input type="range" min={0.3} max={3} step={0.1} value={anim.speed} onChange={e => updAnim('speed', parseFloat(e.target.value))} /></div>
+                        </div>
+                        {anim.type === 'progress' && <div><h4 className="ctrl-heading"><Ico name="Type" size={13} /> Label</h4><input type="text" value={anim.label} onChange={e => updAnim('label', e.target.value)} className="ctrl-input" placeholder="Optional label..." /></div>}
+                    </div>
+                );
+            };
+
+            // ── Previews ──────────────────────────────────────────────────────
+            const renderPreview = () => {
+                if (activeComponent === 'button') return (
+                    <button className="transition-all duration-300 font-semibold" style={{
+                        background: btn.gradient ? `linear-gradient(135deg,${btn.bgColor},${btn.gradientEnd})` : btn.bgColor,
+                        color: btn.textColor, padding: `${btn.paddingY}px ${btn.paddingX}px`,
+                        fontSize: `${btn.fontSize}px`, borderRadius: `${btn.borderRadius}px`,
+                        boxShadow: `0 4px ${btn.shadow}px rgba(0,0,0,0.25)`, border: 'none', cursor: 'pointer',
+                    }}
+                        onMouseEnter={e => { if (btn.hoverScale) { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = `0 8px ${btn.shadow * 1.5}px rgba(0,0,0,0.35)`; } }}
+                        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = `0 4px ${btn.shadow}px rgba(0,0,0,0.25)`; }}>
+                        {btn.text}
+                    </button>
+                );
+                if (activeComponent === 'card') return (
+                    <div style={{ background: card.bgColor, border: `1px solid ${card.borderColor}`, borderRadius: `${card.borderRadius}px`, boxShadow: `0 8px ${card.shadow}px rgba(0,0,0,0.4)`, overflow: 'hidden', width: '240px' }}>
+                        {card.showImage && <div style={{ height: '120px', background: 'linear-gradient(135deg,rgba(59,130,246,0.2),rgba(139,92,246,0.2))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Ico name="Box" size={32} className="text-blue-400 opacity-50" /></div>}
+                        <div style={{ padding: '16px' }}>
+                            <h3 style={{ color: '#f1f5f9', fontWeight: 700, marginBottom: '6px', fontSize: '15px' }}>{card.title}</h3>
+                            <p style={{ color: '#94a3b8', fontSize: '13px', lineHeight: '1.5' }}>{card.subtitle}</p>
+                            {card.showButton && <button style={{ marginTop: '14px', background: card.buttonColor, color: 'white', border: 'none', padding: '8px 18px', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 600, width: '100%' }}>Learn More</button>}
+                        </div>
+                    </div>
+                );
+                if (activeComponent === 'input') return (
+                    <div style={{ width: '280px' }}>
+                        <label style={{ color: '#94a3b8', fontSize: '13px', display: 'block', marginBottom: '6px' }}>{inp.label}</label>
+                        <div style={{ position: 'relative' }}>
+                            {inp.showIcon && <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', fontSize: '14px' }}>✉</span>}
+                            <input type="text" placeholder={inp.placeholder} style={{
+                                width: '100%', background: inp.bgColor, border: `1px solid ${inp.borderColor}`,
+                                borderRadius: `${inp.borderRadius}px`, color: inp.textColor, fontSize: `${inp.fontSize}px`,
+                                padding: `10px 12px 10px ${inp.showIcon ? '36px' : '12px'}`, outline: 'none', transition: 'border-color 0.2s, box-shadow 0.2s',
+                            }}
+                                onFocus={e => { e.target.style.borderColor = inp.focusColor; e.target.style.boxShadow = `0 0 0 3px ${inp.focusColor}33`; }}
+                                onBlur={e => { e.target.style.borderColor = inp.borderColor; e.target.style.boxShadow = 'none'; }} />
+                        </div>
+                    </div>
+                );
+                if (activeComponent === 'badge') {
+                    const isSolid = badge.variant === 'solid';
+                    const isOutline = badge.variant === 'outline';
+                    const bg = isSolid ? badge.bgColor : isOutline ? 'transparent' : `${badge.bgColor}22`;
+                    const border = isOutline ? `1.5px solid ${badge.bgColor}` : 'none';
+                    const color = isSolid ? badge.textColor : badge.bgColor;
+                    return (
+                        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: bg, border, color, fontSize: `${badge.fontSize}px`, padding: `${badge.paddingY}px ${badge.paddingX}px`, borderRadius: `${badge.borderRadius}px`, fontWeight: 600 }}>
+                            {badge.showDot && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: badge.dotColor, display: 'inline-block' }} />}
+                            {badge.text}
+                        </div>
+                    );
+                }
+                // ── NEW: Chart preview ───────────────────────────────────────
+                if (activeComponent === 'chart') {
+                    const barHeights = [40, 65, 45, 80, 55, 70, 90, 50, 75, 60, 85, 35].slice(0, chart.barCount);
+                    const maxH = Math.max(...barHeights);
+                    if (chart.type === 'bar') return (
+                        <div style={{ width: '100%', maxWidth: '320px' }}>
+                            {chart.title && <p style={{ color: '#f1f5f9', fontSize: '13px', fontWeight: 600, marginBottom: '12px' }}>{chart.title}</p>}
+                            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px', height: '140px', position: 'relative', padding: '0 4px' }}>
+                                {chart.showGrid && [25, 50, 75, 100].map(pct => (
+                                    <div key={pct} style={{ position: 'absolute', left: 0, right: 0, bottom: `${pct}%`, borderTop: '1px dashed rgba(255,255,255,0.06)', pointerEvents: 'none' }} />
+                                ))}
+                                {barHeights.map((h, i) => (
+                                    <div key={i} style={{ flex: 1, borderRadius: `${chart.barRadius}px ${chart.barRadius}px 0 0`, background: `linear-gradient(to top, ${chart.primaryColor}cc, ${chart.primaryColor})`, height: `${(h / maxH) * 100}%`, transition: 'height 0.4s ease' }} />
+                                ))}
+                            </div>
+                        </div>
+                    );
+                    if (chart.type === 'ring') {
+                        const r = 56, circ = 2 * Math.PI * r;
+                        const dash = (chart.ringValue / 100 * circ).toFixed(1);
+                        const gap = (circ - parseFloat(dash)).toFixed(1);
+                        return (
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                                {chart.title && <p style={{ color: '#94a3b8', fontSize: '13px' }}>{chart.title}</p>}
+                                <div style={{ position: 'relative', width: '160px', height: '160px' }}>
+                                    <svg viewBox="0 0 120 120" style={{ width: '160px', height: '160px', transform: 'rotate(-90deg)' }}>
+                                        <circle cx="60" cy="60" r={r} fill="none" stroke={chart.secondaryColor} strokeWidth={chart.ringWidth} />
+                                        <circle cx="60" cy="60" r={r} fill="none" stroke={chart.primaryColor} strokeWidth={chart.ringWidth}
+                                            strokeDasharray={`${dash} ${gap}`} strokeLinecap="round"
+                                            style={{ transition: 'stroke-dasharray 0.5s ease' }} />
+                                    </svg>
+                                    {chart.showLabel && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
+                                        <span style={{ fontSize: '28px', fontWeight: 700, color: '#f1f5f9' }}>{chart.ringValue}%</span>
+                                    </div>}
+                                </div>
+                            </div>
+                        );
+                    }
+                    if (chart.type === 'stats') {
+                        const stats2 = [{ l: 'Users', v: '12K', c: chart.primaryColor }, { l: 'Revenue', v: '$4K', c: '#a78bfa' }, { l: 'Rate', v: '94%', c: '#34d399' }, { l: 'Avg', v: '3.2s', c: '#f472b6' }];
+                        return (
+                            <div>
+                                {chart.title && <p style={{ color: '#f1f5f9', fontSize: '13px', fontWeight: 600, marginBottom: '12px', textAlign: 'center' }}>{chart.title}</p>}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '10px', maxWidth: '260px' }}>
+                                    {stats2.map((s, i) => (
+                                        <div key={i} style={{ background: chart.secondaryColor, border: '1px solid rgba(255,255,255,0.08)', borderRadius: `${chart.barRadius}px`, padding: '14px', textAlign: 'center' }}>
+                                            <div style={{ fontSize: '20px', fontWeight: 700, color: s.c, marginBottom: '4px' }}>{s.v}</div>
+                                            <div style={{ fontSize: '11px', color: '#64748b' }}>{s.l}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    }
+                    if (chart.type === 'line') {
+                        const pts = barHeights.map((v, i) => ({ x: i / (barHeights.length - 1) * 280 + 10, y: 120 - 10 - (v / maxH * 100) }));
+                        const dPath = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+                        const areaPath = dPath + ` L${pts[pts.length - 1].x},130 L${pts[0].x},130 Z`;
+                        return (
+                            <div style={{ width: '100%', maxWidth: '320px' }}>
+                                {chart.title && <p style={{ color: '#f1f5f9', fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>{chart.title}</p>}
+                                <svg viewBox="0 0 300 130" style={{ width: '100%', height: '130px', overflow: 'visible' }}>
+                                    <defs>
+                                        <linearGradient id="chartAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                                            <stop offset="0%" stopColor={chart.primaryColor} stopOpacity="0.35" />
+                                            <stop offset="100%" stopColor={chart.primaryColor} stopOpacity="0" />
+                                        </linearGradient>
+                                    </defs>
+                                    {chart.showGrid && [25, 50, 75].map(pct => (
+                                        <line key={pct} x1="10" x2="290" y1={130 - pct} y2={130 - pct} stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+                                    ))}
+                                    <path d={areaPath} fill="url(#chartAreaGrad)" />
+                                    <path d={dPath} fill="none" stroke={chart.primaryColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                    {pts.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r="3.5" fill={chart.primaryColor} />)}
+                                </svg>
+                            </div>
+                        );
+                    }
+                }
+                if (activeComponent === 'animation') {
+                    const dur = anim.speed + 's';
+                    const spinStyle = `
+                        @keyframes anim-spin-preview { to { transform: rotate(360deg); } }
+                        @keyframes anim-pulse-preview { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.55;transform:scale(0.92)} }
+                        @keyframes anim-bounce-preview { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-${Math.round(anim.size * 0.8)}px)} }
+                        @keyframes anim-progress-preview { 0%{width:0%} 100%{width:100%} }
+                        .anim-spin-el { animation: anim-spin-preview ${dur} linear infinite; }
+                        .anim-pulse-el { animation: anim-pulse-preview ${dur} ease-in-out infinite; }
+                        .anim-bounce-el { animation: anim-bounce-preview ${dur} ease-in-out infinite; }
+                        .anim-bounce-el:nth-child(2){ animation-delay:${(anim.speed * 0.15).toFixed(2)}s }
+                        .anim-bounce-el:nth-child(3){ animation-delay:${(anim.speed * 0.3).toFixed(2)}s }
+                        .anim-progress-el { animation: anim-progress-preview ${dur} ease-in-out infinite alternate; }
+                    `;
+                    return (
+                        <div className="flex flex-col items-center gap-4">
+                            <style>{spinStyle}</style>
+                            {anim.type === 'spinner' && <div className="anim-spin-el" style={{ width: `${anim.size}px`, height: `${anim.size}px`, borderRadius: '50%', border: `${anim.borderWidth}px solid ${anim.secondaryColor}`, borderTopColor: anim.color }} />}
+                            {anim.type === 'pulse' && <div className="anim-pulse-el" style={{ width: `${anim.size}px`, height: `${anim.size}px`, background: anim.color, borderRadius: `${anim.borderRadius}px` }} />}
+                            {anim.type === 'dots' && <div style={{ display: 'flex', gap: `${Math.round(anim.size * 0.4)}px`, alignItems: 'center' }}>{[0, 1, 2].map(i => (<div key={i} className="anim-bounce-el" style={{ width: `${anim.size}px`, height: `${anim.size}px`, background: anim.color, borderRadius: '50%', animationDelay: i === 1 ? `${(anim.speed * 0.15).toFixed(2)}s` : i === 2 ? `${(anim.speed * 0.3).toFixed(2)}s` : '0s' }} />))}</div>}
+                            {anim.type === 'progress' && <div style={{ width: '220px' }}><div style={{ background: anim.secondaryColor, borderRadius: `${anim.borderRadius}px`, overflow: 'hidden' }}><div className="anim-progress-el" style={{ height: `${anim.size}px`, background: anim.color }} /></div>{anim.label && <p style={{ marginTop: '8px', fontSize: '12px', color: '#94a3b8', textAlign: 'center' }}>{anim.label}</p>}</div>}
+                        </div>
+                    );
+                }
+            };
+
+            return (
+                <section id="playground" className="py-20 relative">
+                    <style>{`
+                        .ctrl-heading { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#64748b; display:flex; align-items:center; gap:6px; margin-bottom:12px; }
+                        .ctrl-label { font-size:13px; color:#94a3b8; display:block; margin-bottom:6px; }
+                        .ctrl-input { width:100%; background:rgba(15,23,42,0.6); border:1px solid #334155; border-radius:8px; padding:9px 14px; font-size:13px; color:white; outline:none; transition:border-color 0.2s; }
+                        .ctrl-input:focus { border-color:#3b82f6; }
+                        .ctrl-checkbox { display:flex; align-items:center; gap:8px; font-size:13px; color:#cbd5e1; cursor:pointer; margin-bottom:8px; }
+                    `}</style>
+                    <div className="max-w-7xl mx-auto px-6">
+                        <SectionHeading subtitle="Playground" title="Visual Builder"
+                            description="Design components in real-time with intuitive controls. See changes instantly and export production-ready code." />
+                        <div className={`glass-strong rounded-2xl overflow-hidden transition-all duration-700 ${justJumped ? 'border-2 border-blue-500/60 shadow-xl shadow-blue-500/20' : 'border border-slate-800'}`}>
+                            {justJumped && (
+                                <div className="flex items-center gap-3 px-6 py-3 bg-blue-500/10 border-b border-blue-500/20 text-blue-300 text-sm animate-pulse">
+                                    <Ico name="Sparkles" size={15} className="text-blue-400" />
+                                    <span><strong className="text-blue-200">{activeComponent.charAt(0).toUpperCase() + activeComponent.slice(1)}</strong> loaded from Component Library — start editing below!</span>
+                                </div>
+                            )}
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-900/50 flex-wrap gap-2">
+                                <div className="flex items-center gap-1 flex-wrap">
+                                    {componentTabs.map(c => (
+                                        <button key={c.id} onClick={() => { setActiveComponent(c.id); setActiveCodeTab('html'); }}
+                                            className={`px-3 py-2 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${activeComponent === c.id ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'text-slate-400 hover:text-white'}`}>
+                                            <Ico name={c.iconName} size={13} />{c.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                <div className="flex items-center gap-1 glass rounded-lg p-1">
+                                    {['Monitor', 'Tablet', 'Smartphone'].map(d => (
+                                        <button key={d} onClick={() => setDeviceView(d.toLowerCase())}
+                                            className={`p-2 rounded-md transition-colors ${deviceView === d.toLowerCase() ? 'bg-slate-700 text-white' : 'text-slate-500'}`}>
+                                            <Ico name={d} size={16} />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="grid lg:grid-cols-12 min-h-[600px]">
+                                <div className="lg:col-span-3 border-r border-slate-800 bg-slate-900/30 overflow-y-auto no-scrollbar p-6">
+                                    {renderControls()}
+                                </div>
+                                <div className="lg:col-span-5 builder-grid flex items-center justify-center p-8">
+                                    <div className="glass rounded-2xl p-10 flex items-center justify-center min-h-[300px] w-full">
+                                        {renderPreview()}
+                                    </div>
+                                </div>
+                                <div className="lg:col-span-4 border-l border-slate-800 bg-slate-950 flex flex-col">
+                                    <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+                                        <div className="flex gap-1">
+                                            {['html', 'css', 'js'].map(tab => (
+                                                <button key={tab} onClick={() => setActiveCodeTab(tab)}
+                                                    className={`px-4 py-1.5 rounded-lg text-xs font-medium uppercase transition-all ${activeCodeTab === tab ? 'tab-active' : 'text-slate-500 hover:text-slate-300'}`}>{tab}</button>
+                                            ))}
+                                        </div>
+                                        <button onClick={handleCopy}
+                                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg glass text-xs text-slate-400 hover:text-white transition-colors">
+                                            <Ico name={copied ? 'Check' : 'Copy'} size={14} className={copied ? 'text-emerald-400' : ''} />
+                                            {copied ? 'Copied!' : 'Copy'}
+                                        </button>
+                                    </div>
+                                    <div className="flex-1 overflow-auto p-4">
+                                        <pre className="code-block rounded-xl p-4 text-xs text-slate-300 overflow-x-auto whitespace-pre-wrap">
+                                            <code>{code[activeCodeTab]}</code>
+                                        </pre>
+                                    </div>
+                                    <div className="p-4 border-t border-slate-800 flex gap-3">
+                                        <button className="flex-1 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                                            <Ico name="Download" size={16} /> Export ZIP
+                                        </button>
+                                        <button className="flex-1 py-2.5 rounded-lg glass text-slate-300 hover:text-white text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                                            <Ico name="Save" size={16} /> Save Preset
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Pricing = () => {
+            const [billing, setBilling] = useState('monthly');
+            const plans = [
+                { name: 'Starter', description: 'Perfect for learning and small projects', monthly: 0, yearly: 0, features: ['50+ Components', 'Basic Customization', 'HTML/CSS Export', 'Community Support', '3 Saved Projects'], cta: 'Get Started Free', popular: false },
+                { name: 'Pro', description: 'For professional developers and teams', monthly: 19, yearly: 15, features: ['100+ Components', 'Advanced Customization', 'HTML/CSS/JS Export', 'Priority Support', 'Unlimited Projects', 'Team Collaboration', 'API Access'], cta: 'Start Pro Trial', popular: true },
+                { name: 'Enterprise', description: 'For organizations with advanced needs', monthly: 49, yearly: 39, features: ['Everything in Pro', 'Custom Components', 'White-label Export', 'SSO & SAML', 'Dedicated Support', 'SLA Guarantee', 'On-premise Option'], cta: 'Contact Sales', popular: false },
+            ];
+            return (
+                <section id="pricing" className="py-32 relative">
+                    <div className="absolute inset-0 grid-pattern opacity-20" />
+                    <div className="max-w-7xl mx-auto px-6 relative z-10">
+                        <SectionHeading subtitle="Pricing" title="Simple, transparent pricing" description="Start free and scale as you grow. No hidden fees, no credit card required." />
+                        <div className="flex justify-center mb-12">
+                            <div className="glass rounded-full p-1 flex items-center">
+                                {['monthly', 'yearly'].map(b => (
+                                    <button key={b} onClick={() => setBilling(b)}
+                                        className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all capitalize flex items-center gap-2 ${billing === b ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}>
+                                        {b}{b === 'yearly' && <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">Save 20%</span>}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {plans.map((plan, i) => (
+                                <div key={i} className={`relative rounded-2xl p-8 ${plan.popular ? 'bg-gradient-to-b from-blue-900/40 to-slate-900/40 border-2 border-blue-500/30' : 'glass-card'}`}>
+                                    {plan.popular && <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold">Most Popular</div>}
+                                    <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+                                    <p className="text-sm text-slate-400 mb-6">{plan.description}</p>
+                                    <div className="mb-8"><span className="text-4xl font-bold">${billing === 'monthly' ? plan.monthly : plan.yearly}</span><span className="text-slate-500">/month</span></div>
+                                    <ul className="space-y-3 mb-8">
+                                        {plan.features.map((f, j) => (<li key={j} className="flex items-center gap-3 text-sm text-slate-300"><Ico name="Check" size={16} className="text-emerald-400 flex-shrink-0" />{f}</li>))}
+                                    </ul>
+                                    <GradientButton variant={plan.popular ? 'primary' : 'cyan'} className="w-full py-3 text-sm">{plan.cta}</GradientButton>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Testimonials = () => {
+            const testimonials = [
+                { name: 'Sarah Chen', role: 'Frontend Lead at TechCorp', avatar: 'SC', color: 'from-blue-500 to-cyan-500', content: 'DevWidget Lab cut our prototyping time by 70%. The visual builder is incredibly intuitive and the exported code is clean production quality.' },
+                { name: 'Marcus Johnson', role: 'Indie Developer', avatar: 'MJ', color: 'from-purple-500 to-pink-500', content: 'I went from idea to deployed landing page in 2 hours. The component library is extensive and the customization options are exactly what I needed.' },
+                { name: 'Elena Rodriguez', role: 'UI/UX Designer', avatar: 'ER', color: 'from-emerald-500 to-teal-500', content: 'Finally a tool that bridges the gap between design and development. I can create pixel-perfect components without touching CSS.' },
+            ];
+            return (
+                <section className="py-32 relative overflow-hidden">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-900/10 rounded-full blur-3xl" />
+                    <div className="max-w-7xl mx-auto px-6 relative z-10">
+                        <SectionHeading subtitle="Testimonials" title="Loved by developers worldwide" description="Join thousands of developers and designers who have transformed their workflow." />
+                        <div className="grid md:grid-cols-3 gap-6">
+                            {testimonials.map((t, i) => (
+                                <GlassCard key={i}>
+                                    <div className="flex items-center gap-1 mb-4">{[1, 2, 3, 4, 5].map(s => (<svg key={s} width="16" height="16" viewBox="0 0 24 24" fill="#facc15" stroke="#facc15" strokeWidth="1"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>))}</div>
+                                    <p className="text-slate-300 mb-6 leading-relaxed">"{t.content}"</p>
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.color} flex items-center justify-center text-white text-sm font-bold`}>{t.avatar}</div>
+                                        <div><div className="font-semibold text-sm">{t.name}</div><div className="text-xs text-slate-500">{t.role}</div></div>
+                                    </div>
+                                </GlassCard>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const CTASection = ({ onNavigate }) => (
+            <section className="py-32 relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/10 to-transparent" />
+                <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+                    <div className="glass-strong rounded-3xl p-12 border border-blue-500/20 glow-blue">
+                        <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to build something <span className="gradient-text">amazing?</span></h2>
+                        <p className="text-lg text-slate-400 mb-10 max-w-2xl mx-auto">Join 12,000+ developers creating stunning interfaces. Start for free, no credit card required.</p>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <GradientButton onClick={() => onNavigate('playground')} iconName="Zap">Launch Playground Free</GradientButton>
+                            <button className="px-8 py-4 rounded-xl font-semibold text-slate-300 border border-slate-700 hover:border-slate-500 hover:text-white transition-all flex items-center gap-2">
+                                <Ico name="Play" size={18} /> Watch Demo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        );
+
+        const Footer = () => (
+            <footer className="border-t border-slate-800 bg-slate-950 pt-20 pb-10">
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="grid md:grid-cols-5 gap-12 mb-16">
+                        <div className="md:col-span-2">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"><Ico name="Layers" size={20} className="text-white" /></div>
+                                <span className="text-xl font-bold">DevWidget<span className="gradient-text"> Lab</span></span>
+                            </div>
+                            <p className="text-slate-400 text-sm leading-relaxed max-w-sm mb-6">The visual frontend playground for building production-ready UI components without writing code.</p>
+                            <div className="flex gap-4">{['Twitter', 'GitHub', 'Discord', 'YouTube'].map(s => (<button key={s} className="w-10 h-10 rounded-lg glass flex items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-all"><Ico name="Globe" size={18} /></button>))}</div>
+                        </div>
+                        {[{ title: 'Product', links: ['Features', 'Components', 'Playground', 'Pricing', 'Changelog'] }, { title: 'Resources', links: ['Documentation', 'Tutorials', 'Blog', 'Templates', 'API'] }, { title: 'Company', links: ['About', 'Careers', 'Contact', 'Privacy', 'Terms'] }].map((col, i) => (
+                            <div key={i}><h4 className="font-semibold mb-4 text-sm">{col.title}</h4><ul className="space-y-3">{col.links.map(link => (<li key={link}><button className="text-sm text-slate-500 hover:text-white transition-colors">{link}</button></li>))}</ul></div>
+                        ))}
+                    </div>
+                    <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p className="text-sm text-slate-600">© 2026 DevWidget Lab. All rights reserved.</p>
+                        <div className="flex gap-6">{['Privacy Policy', 'Terms of Service', 'Cookies'].map(l => (<button key={l} className="text-sm text-slate-600 hover:text-slate-400 transition-colors">{l}</button>))}</div>
+                    </div>
+                </div>
+            </footer>
+        );
+
+        const App = () => {
+            const [playgroundComponent, setPlaygroundComponent] = useState('button');
+            const [playgroundPreset, setPlaygroundPreset] = useState(null);
+            useScrollReveal();
+
+            const handleNavigate = (view) => {
+                if (view === 'landing') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+                setTimeout(() => { const el = document.getElementById(view); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 100);
+            };
+
+            const handleOpenInPlayground = (componentType, preset) => {
+                setPlaygroundComponent(componentType);
+                setPlaygroundPreset({ ...preset, _ts: Date.now() }); // unique each click
+                setTimeout(() => {
+                    const el = document.getElementById('playground');
+                    if (el) { const top = el.getBoundingClientRect().top + window.scrollY - 80; window.scrollTo({ top, behavior: 'smooth' }); }
+                }, 150);
+            };
+
+            useEffect(() => { if (window.gsap && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger); }, []);
+
+            return (
+                <div className="min-h-screen bg-slate-950">
+                    <Navigation onNavigate={handleNavigate} />
+                    <main>
+                        <Hero onNavigate={handleNavigate} />
+                        <Stats />
+                        <Features />
+                        <ComponentShowcase onOpenInPlayground={handleOpenInPlayground} />
+                        <Playground activeComponent={playgroundComponent} setActiveComponent={setPlaygroundComponent} incomingPreset={playgroundPreset} />
+                        <Pricing />
+                        <Testimonials />
+                        <CTASection onNavigate={handleNavigate} />
+                    </main>
+                    <Footer />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>

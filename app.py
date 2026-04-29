@@ -1,131 +1,89 @@
 import streamlit as st
 import streamlit.components.v1 as components
-import time
 
 st.set_page_config(
     page_title="DevWidget Lab",
-    page_icon="⚡",
+    page_icon="",
     layout="wide"
 )
 
-# ---------------- Styling ----------------
+# ---------- Custom Styling ----------
 st.markdown("""
 <style>
-.main {
-background: linear-gradient(to right,#0f172a,#1e293b);
-color:white;
+
+html, body, [class*="css"]{
+background: linear-gradient(135deg,#0f172a,#1e293b,#0f172a);
 }
 
-.hero{
+.block-container{
+padding-top:8rem;
 text-align:center;
-padding-top:60px;
-padding-bottom:60px;
 }
 
 .title{
-font-size:70px;
+font-size:90px;
 font-weight:800;
+background: linear-gradient(90deg,#60a5fa,#a78bfa,#38bdf8);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+margin-bottom:20px;
 }
 
 .subtitle{
 font-size:24px;
 color:#cbd5e1;
-}
-
-.feature-box{
-background:#1e293b;
-padding:25px;
-border-radius:20px;
-box-shadow:0px 4px 20px rgba(0,0,0,.25);
+margin-bottom:60px;
 }
 
 div.stButton > button{
-font-size:22px;
-padding:15px 35px;
-border-radius:15px;
+background: linear-gradient(90deg,#3b82f6,#8b5cf6);
+color:white;
+font-size:26px;
+padding:18px 50px;
+border:none;
+border-radius:18px;
+box-shadow:0px 6px 25px rgba(99,102,241,.45);
+transition:0.3s;
+}
+
+div.stButton > button:hover{
+transform:scale(1.05);
+box-shadow:0px 8px 30px rgba(99,102,241,.65);
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ---------------- Intro Screen ----------------
+# ---------- Intro Screen ----------
 st.markdown("""
-<div class='hero'>
-<div class='title'>⚡ DevWidget Lab</div>
-
-<div class='subtitle'>
-Visual UI Component Builder using HTML, CSS, JS + Python Streamlit
+<div class="title">
+DevWidget Lab
 </div>
 
+<div class="subtitle">
+Interactive UI Builder
 </div>
 """, unsafe_allow_html=True)
 
-st.success("Integrated Python + Frontend Project")
 
-# loading effect
-with st.spinner("Launching DevWidget Platform..."):
-    time.sleep(2)
+# ---------- Launch Button ----------
+if st.button("Click Here To Launch DevWidget Lab"):
 
-# ---------------- Overview ----------------
-st.header("📌 Project Overview")
-
-c1,c2,c3 = st.columns(3)
-
-with c1:
     st.markdown("""
-    <div class='feature-box'>
-    <h3>🎨 UI Components</h3>
-    Buttons, cards and reusable widgets.
-    </div>
+    <h2 style='
+    text-align:center;
+    background:linear-gradient(90deg,#60a5fa,#a78bfa);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    margin-top:40px;'>
+    Launching DevWidget...
+    </h2>
     """, unsafe_allow_html=True)
-
-with c2:
-    st.markdown("""
-    <div class='feature-box'>
-    <h3>⚙ Interactive Builder</h3>
-    Build and customize visually.
-    </div>
-    """, unsafe_allow_html=True)
-
-with c3:
-    st.markdown("""
-    <div class='feature-box'>
-    <h3>💻 Code Generation</h3>
-    Generate production-ready code.
-    </div>
-    """, unsafe_allow_html=True)
-
-st.divider()
-
-# ---------------- Launch HTML Project ----------------
-st.header("🚀 Launch Main Project")
-
-st.write("Click below to open the DevWidget HTML project inside Streamlit.")
-
-if st.button("Open DevWidget Lab"):
-
-    st.balloons()
 
     with open("devwidget.html","r",encoding="utf-8") as f:
-        html_code = f.read()
+        html_code=f.read()
 
     components.html(
         html_code,
         height=1000,
         scrolling=True
     )
-
-
-# ---------------- About ----------------
-with st.expander("About This Project"):
-    st.write("""
-Technologies Used:
-- Python Streamlit
-- HTML
-- CSS
-- JavaScript
-
-Streamlit provides the dashboard and launcher.
-The main component builder runs through the integrated HTML project.
-""")
-
-st.caption("Submitted as Python + Web Integrated Project")
